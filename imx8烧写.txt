@@ -1,0 +1,4 @@
+1.确保fastboot驱动已经正确安装。
+2.单板进入串行下载模式,OTG端口
+3.第一次烧写：	
+	nofs: erase userdata and misc partition

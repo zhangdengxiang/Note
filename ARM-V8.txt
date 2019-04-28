@@ -1,0 +1,11 @@
+ARM64:
+kernel启动时x0是dtb的物理地址，x1～x3必须是0（非零值是保留将来使用）。
+	
+执行切换：
+AArch32和AArch64之间的切换只能通过发生异常或者系统Reset来实现.（A32 -> T32之间是通过BX指令切换的）
+
+
+页表的建立：
+ARMv8实际上提供了TCR_ELx （Translation Control Register (ELx)可以对MMU的输入地址（也就是虚拟地址）进行配置
+虚拟地址空间的范围是0x0000_0000_0000_0000 ～ 0x0000_FFFF_FFFF_FFFF 总共256TB
+	

@@ -1,0 +1,75 @@
+1. 拷贝脚本到本地
+scp -P 29418 -p 192.168.100.8:/hooks/commit-msg .
+2. 把脚本拷贝到git钩子路径
+cp commit-msg /usr/share/git-core/templates/hooks
+chmod +x /usr/share/git-core/templates/hooks/commit-msg
+
+
+repo init -u ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-android -b p9.0.0_1.0.0-ga_aries
+
+1.安卓编译的过程中会通过prebuild/sdk/tools目录中的jack-admin脚本来运行。
+2.安装必备的库：
+	sudo apt-get install uuid uuid-dev
+	sudo apt-get install zlib1g-dev liblz-dev
+	sudo apt-get install liblzo2-2 liblzo2-dev
+	sudo apt-get install lzop
+	sudo apt-get install git-core curl
+	sudo apt-get install u-boot-tools
+	sudo apt-get install mtd-utils
+	sudo apt-get install android-tools-fsutils
+	sudo apt-get install openjdk-8-jdk
+	sudo apt-get install device-tree-compiler
+	sudo apt-get install gdisk
+	sudo apt-get install m4
+	sudo apt-get install libz-dev
+2.更新环境变量：
+	至源码顶层：
+		source build/envsetup.sh
+3.执行lunch操作：80_imx8qm
+	lunch <buildName-buildType>
+	Build names：
+		evk_8mm：i.MX 8M Mini EVK Board
+		evk_8mq：i.MX 8M Quad EVK Board
+		mek_8q ：i.MX 8QuadMax/i.MX 8QuadXPlus MEK Board
+	Build types：
+		user：     Production-ready image, no debug
+		userdebug：Provides image with root access and debug, similar to "user"
+		eng：      Development image with debug tools
+	例如：
+		lunch panda_imx8qm-userdebug
+4.编译：
+	 make 2>&1 | tee build-log.txt
+5.输出路径：
+	./out/target/product/
+	
+6.单独编译uboot:
+	source build/envsetup.sh
+	lunch panda_imx8qm-userdebug
+	make bootloader -j4
+7.单独编译kernel：
+	$ export ARCH=arm64
+	$ export CROSS_COMPILE=
+		/home/zhangdengxiang/imx8/android/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+	$ make android_defconfig
+	$ make KCFLAGS=-mno-android
+	
+	命令如下：
+	make ARCH=arm64 CROSS_COMPILE=/home/zhangdengxiang/imx8/android/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android- android_defconfig
+	make KCFLAGS=-mno-android
+	
+8.单独编译boot.img
+	source build/envsetup.sh
+	lunch panda_imx8qm-userdebug
+	make bootimage -j4
+9.单独编译dtbo
+	source build/envsetup.sh
+	lunch panda_imx8qm-userdebug
+	make dtboimage -j4
+	
+
+
+	
+	
+
+
+	
