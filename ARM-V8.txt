@@ -4,8 +4,16 @@ kernel启动时x0是dtb的物理地址，x1～x3必须是0（非零值是保留�
 执行切换：
 AArch32和AArch64之间的切换只能通过发生异常或者系统Reset来实现.（A32 -> T32之间是通过BX指令切换的）
 
-
-页表的建立：
-ARMv8实际上提供了TCR_ELx （Translation Control Register (ELx)可以对MMU的输入地址（也就是虚拟地址）进行配置
-虚拟地址空间的范围是0x0000_0000_0000_0000 ～ 0x0000_FFFF_FFFF_FFFF 总共256TB
-	
+																														低于VMALLOC_START:0xFFFF_0000_0000_0000的都不是内核空间						
+页表的建立：																											|																																						
+ARMv8实际上提供了TCR_ELx （Translation Control Register (ELx)可以对MMU的输入地址（也就是虚拟地址）进行配置				|							
+虚拟地址空间的范围是0x0000_0000_0000_0000 ～ 0x0000_FFFF_FFFF_FFFF 总共256TB，实际分成2部分，用于内核空间和用户空间
+中间的为无效地址，对其访问会产生MMU fault																				|																					
+																														|				
+			_/-TTBR0_EL1（Translation Table Base Register 0 (EL1) 当虚拟地址的最高位63bit为1时使用。代表的是地址用于内核空间                       
+PGD的基地址<_		
+	  |		 \-TTBR1_EL1（Translation Table Base Register 1 (EL1) 当虚拟地址的最高位63bit为0时使用。代表的是地址用于用户空间
+      |
+	  v   		 
+	  |---->:这个基地址实际也就是0级页表的基地址，L0 		 
+	     		 

@@ -1,0 +1,5 @@
+memory hierarchy：内存体系
+
+PoU 是纵向的，表示各级cache level之间数据的统一性。
+PoC 是横向的，表示总线上多个 “观察者”，所看到的数据一致性。
+为了保证PoU PoC,需要有cache mantain。

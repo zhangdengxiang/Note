@@ -237,3 +237,190 @@ set_cpu_boot_mode_flag:                                                         
 	dc	ivac, x1			// Invalidate potentially stale cache line
 	ret
 ENDPROC(set_cpu_boot_mode_flag)
+
+__create_page_tables:
+	mov	x28, lr				//保存返回地址
+	/*
+	 * Invalidate the idmap and swapper page tables to avoid potential
+	 * dirty cache lines being evicted.
+	 */
+	adrp	x0, idmap_pg_dir	//获取idmap的页表基地址（物理地址）
+	ldr	x1, =(IDMAP_DIR_SIZE + SWAPPER_DIR_SIZE + RESERVED_TTBR0_SIZE)	//idmap的页表结束地址
+	bl	__inval_dcache_area		//在页表清除前需要先对cache进行无效操作。因为这个时候mmu还没有开启
+	/*
+	 * Clear the idmap and swapper page tables.
+	 */
+	adrp	x0, idmap_pg_dir	//重新获取idmap的页表基地址（物理地址）
+	ldr	x1, =(IDMAP_DIR_SIZE + SWAPPER_DIR_SIZE + RESERVED_TTBR0_SIZE)  //idmap的页表结束地址
+																		//#define IDMAP_DIR_SIZE	(IDMAP_PGTABLE_LEVELS * PAGE_SIZE)
+1:	stp	xzr, xzr, [x0], #16		//页表清零
+	stp	xzr, xzr, [x0], #16
+	stp	xzr, xzr, [x0], #16
+	stp	xzr, xzr, [x0], #16
+	subs	x1, x1, #64			//相当于cmp	x0, x1 ，实则就是判断页表清零是否到达了结束地址
+	b.ne	1b
+	mov	x7, SWAPPER_MM_MMUFLAGS //#define SWAPPER_MM_MMUFLAGS	(PMD_ATTRINDX(MT_NORMAL) | SWAPPER_PMD_FLAGS)
+								//
+	/*
+	 * Create the identity mapping.
+	 */
+	adrp	x0, idmap_pg_dir
+	adrp	x3, __idmap_text_start		// __pa(__idmap_text_start)
+										//VMLINUX_SYMBOL(__idmap_text_start) = .;
+
+#ifndef CONFIG_ARM64_VA_BITS_48
+#define EXTRA_SHIFT	(PGDIR_SHIFT + PAGE_SHIFT - 3)
+#define EXTRA_PTRS	(1 << (48 - EXTRA_SHIFT))
+	/*
+	 * If VA_BITS < 48, it may be too small to allow for an ID mapping to be
+	 * created that covers system RAM if that is located sufficiently high
+	 * in the physical address space. So for the ID map, use an extended
+	 * virtual range in that case, by configuring an additional translation
+	 * level.
+	 * First, we have to verify our assumption that the current value of
+	 * VA_BITS was chosen such that all translation levels are fully
+	 * utilised, and that lowering T0SZ will always result in an additional
+	 * translation level to be configured.
+	 */
+#if VA_BITS != EXTRA_SHIFT
+#error "Mismatch between VA_BITS and page size/number of translation levels"
+#endif
+	/*
+	 * Calculate the maximum allowed value for TCR_EL1.T0SZ so that the
+	 * entire ID map region can be mapped. As T0SZ == (64 - #bits used),
+	 * this number conveniently equals the number of leading zeroes in
+	 * the physical address of __idmap_text_end.
+	 */
+	adrp	x5, __idmap_text_end
+	clz	x5, x5
+	cmp	x5, TCR_T0SZ(VA_BITS)	// default T0SZ small enough?
+	b.ge	1f			// .. then skip additional level
+
+	adr_l	x6, idmap_t0sz
+	str	x5, [x6]
+	dmb	sy
+	dc	ivac, x6		// Invalidate potentially stale cache line
+	create_table_entry x0, x3, EXTRA_SHIFT, EXTRA_PTRS, x5, x6
+1:
+#endif
+
+	create_pgd_entry x0, x3, x5, x6
+	mov	x5, x3				// __pa(__idmap_text_start)
+	adr_l	x6, __idmap_text_end		// __pa(__idmap_text_end)
+	create_block_map x0, x7, x3, x5, x6
+	/*
+	 * Map the kernel image (starting with PHYS_OFFSET).
+	 */
+	adrp	x0, swapper_pg_dir
+	mov_q	x5, KIMAGE_VADDR + TEXT_OFFSET	// compile time __va(_text)
+	add	x5, x5, x23			// add KASLR displacement
+	create_pgd_entry x0, x5, x3, x6
+	adrp	x6, _end			// runtime __pa(_end)
+	adrp	x3, _text			// runtime __pa(_text)
+	sub	x6, x6, x3			// _end - _text
+	add	x6, x6, x5			// runtime __va(_end)
+	create_block_map x0, x7, x3, x5, x6
+	/*
+	 * Since the page tables have been populated with non-cacheable
+	 * accesses (MMU disabled), invalidate the idmap and swapper page
+	 * tables again to remove any speculatively loaded cache lines.
+	 */
+	adrp	x0, idmap_pg_dir
+	ldr	x1, =(IDMAP_DIR_SIZE + SWAPPER_DIR_SIZE + RESERVED_TTBR0_SIZE)
+	dmb	sy
+	bl	__inval_dcache_area
+	ret	x28
+ENDPROC(__create_page_tables)
+
+
+ENTRY(__cpu_setup)
+	tlbi	vmalle1				// Invalidate local TLB
+	dsb	nsh
+
+	mov	x0, #3 << 20
+	msr	cpacr_el1, x0			// Enable FP/ASIMD
+	mov	x0, #1 << 12			// Reset mdscr_el1 and disable
+	msr	mdscr_el1, x0			// access to the DCC from EL0
+	isb					// Unmask debug exceptions now,
+	enable_dbg				// since this is per-cpu
+	reset_pmuserenr_el0 x0			// Disable PMU access from EL0
+	/*
+	 * Memory region attributes for LPAE:
+	 *
+	 *   n = AttrIndx[2:0]
+	 *			n	MAIR
+	 *   DEVICE_nGnRnE	000	00000000
+	 *   DEVICE_nGnRE	001	00000100
+	 *   DEVICE_GRE		010	00001100
+	 *   NORMAL_NC		011	01000100
+	 *   NORMAL		100	11111111
+	 *   NORMAL_WT		101	10111011
+	 */
+	ldr	x5, =MAIR(0x00, MT_DEVICE_nGnRnE) | \
+		     MAIR(0x04, MT_DEVICE_nGnRE) | \
+		     MAIR(0x0c, MT_DEVICE_GRE) | \
+		     MAIR(0x44, MT_NORMAL_NC) | \
+		     MAIR(0xff, MT_NORMAL) | \
+		     MAIR(0xbb, MT_NORMAL_WT)
+	msr	mair_el1, x5
+	/*
+	 * Prepare SCTLR
+	 */
+	adr	x5, crval
+	ldp	w5, w6, [x5]
+	mrs	x0, sctlr_el1
+	bic	x0, x0, x5			// clear bits
+	orr	x0, x0, x6			// set bits
+	/*
+	 * Set/prepare TCR and TTBR. We use 512GB (39-bit) address range for
+	 * both user and kernel.
+	 */
+	ldr	x10, =TCR_TxSZ(VA_BITS) | TCR_CACHE_FLAGS | TCR_SMP_FLAGS | \
+			TCR_TG_FLAGS | TCR_ASID16 | TCR_TBI0 | TCR_A1
+	tcr_set_idmap_t0sz	x10, x9
+
+	/*
+	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the IPS bits in
+	 * TCR_EL1.
+	 */
+	mrs	x9, ID_AA64MMFR0_EL1
+	bfi	x10, x9, #32, #3
+#ifdef CONFIG_ARM64_HW_AFDBM
+	/*
+	 * Hardware update of the Access and Dirty bits.
+	 */
+	mrs	x9, ID_AA64MMFR1_EL1
+	and	x9, x9, #0xf
+	cbz	x9, 2f
+	cmp	x9, #2
+	b.lt	1f
+#ifdef CONFIG_ARM64_ERRATUM_1024718
+	/* Disable hardware DBM on Cortex-A55 r0p0, r0p1 & r1p0 */
+	cpu_midr_match MIDR_CORTEX_A55, MIDR_CPU_VAR_REV(0, 0), MIDR_CPU_VAR_REV(1, 0), x1, x2, x3, x4
+	cbnz	x1, 1f
+#endif
+	orr	x10, x10, #TCR_HD		// hardware Dirty flag update
+1:	orr	x10, x10, #TCR_HA		// hardware Access flag update
+2:
+#endif	/* CONFIG_ARM64_HW_AFDBM */
+	msr	tcr_el1, x10
+	ret					// return to head.S
+ENDPROC(__cpu_setup)
+
+	/*
+	 * We set the desired value explicitly, including those of the
+	 * reserved bits. The values of bits EE & E0E were set early in
+	 * el2_setup, which are left untouched below.
+	 *
+	 *                 n n            T
+	 *       U E      WT T UD     US IHBS
+	 *       CE0      XWHW CZ     ME TEEA S
+	 * .... .IEE .... NEAI TE.I ..AD DEN0 ACAM
+	 * 0011 0... 1101 ..0. ..0. 10.. .0.. .... < hardware reserved
+	 * .... .1.. .... 01.1 11.1 ..01 0.01 1101 < software settings
+	 */
+	.type	crval, #object
+crval:
+	.word	0xfcffffff			// clear
+	.word	0x34d5d91d			// set
+	.popsection
