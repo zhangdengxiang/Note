@@ -1,0 +1,8 @@
+1.未更改任何代码：
+	耗时：3.5S
+2.去掉SPL：
+	耗时：3.5S
+	
+	
+	
+	/out/target/product/panda_imx8qm/obj/UBOOT_OBJ

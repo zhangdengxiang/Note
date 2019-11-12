@@ -1,0 +1,38 @@
+
+/home/zhangdengxiang/kernel/workspace/kernel_imx_android/arch/arm64/boot/dts/freescale/fsl-imx8qm-aries-guest-d532.dtsi
+
+
+labeled_gpio: labeled-gpio {
+            compatible = "hsae,labeled-gpio";
+            status = "disabled";
+    };
+
+
+/* export alias gpio */
+&labeled_gpio {
+        status = "okay";
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_labeled_gpio>;
+
+        reverse-gpio = <&gpio0 2 0>; /* alias: reverse */
+        init-reverse = "in";
+
+        config-gpio = <&gpio0 26 0>; /* alias: config */
+        init-config = "in";
+
+        //lpspi0-req-gpio = <&gpio0 12 0>; /* alias: lpspi0-req */
+        //init-lpspi0-req = "in";
+
+        //lpspi0-ack-gpio = <&gpio0 16 0>; /* alias: lpspi0-ack */
+        //init-lpspi0-ack- = "in";
+
+        usbotg1-id-gpio = <&gpio4 25 0>; /* alias: usbotg1-id */
+        init-usbotg1-id = "low"; /* "in" ,"low", "high" */
+        bi-direction-usbotg1-id;
+};
+
+
+驱动：
+=======未使用-----/home/zhangdengxiang/kernel/workspace/kernel_imx_android/drivers/gpio/gpio-labeled-export.c
+/home/zhangdengxiang/kernel/workspace/kernel_imx_android/drivers/gpio/gpio-mxc.c

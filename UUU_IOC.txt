@@ -1,0 +1,451 @@
+UUU升级IOC：
+
+
+下载入口
+ret = iocUpdater->tryRequestDownload
+(enableEnc, enableCompress, iocBufLen, (addr==NULL)?NULL:addr+2, addrLen, filePath);
+
+
+    fsl-imx8qm-aries-guest-hsd156juw2-cyttsp6.dts
+        fsl-imx8qm-aries-guest-tft1p1799-cyttsp6.dts
+        fsl-imx8qm-aries-guest.dtsi
+		
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+kernel信息提取：
+
+lpspi0: lpspi@5a000000 {
+                compatible = "fsl,imx7ulp-spi";
+                reg = <0x0 0x5a000000 0x0 0x10000>;
+                interrupts = <GIC_SPI 216 IRQ_TYPE_LEVEL_HIGH>;
+                interrupt-parent = <&gic>;
+                clocks = <&clk IMX8QM_SPI0_CLK>,
+                         <&clk IMX8QM_SPI0_IPG_CLK>;
+                clock-names = "per", "ipg";
+                assigned-clocks = <&clk IMX8QM_SPI0_CLK>;
+                assigned-clock-rates = <20000000>;
+                power-domains = <&pd_dma_lpspi0>;
+                status = "disabled";
+        };
+
+pd_dma_lpspi0: PD_DMA_SPI_0 {
+                                reg = <SC_R_SPI_0>;
+                                #power-domain-cells = <0>;
+                                power-domains = <&pd_dma>;
+                        };
+						
+ pd_dma_lpspi2: PD_DMA_SPI_2 {
+                                reg = <SC_R_SPI_2>;
+                                #power-domain-cells = <0>;
+                                power-domains = <&pd_dma>;
+                        };
+						
+pd_dma: PD_DMA {
+                        compatible = "nxp,imx8-pd";
+                        reg = <SC_R_LAST>;
+                        #power-domain-cells = <0>;
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+					....
+					....
+}
+
+clk {
+		compatible = "fsl,imx8qm-clk";
+		#clock-cells = <0x1>;
+		linux,phandle = <0x4>;
+		phandle = <0x4>;
+};
+
+电源域：
+	spi电源域reg：SC_R_SPI_0 ---> 父节点：pd_dma
+两套时钟：drivers\clk\imx\clk-imx8qm.c
+	compatible = "fsl,imx8qm-clk"
+	第一套时钟：
+	1.
+		clks[IMX8QM_SPI2_DIV] = imx_clk_divider_scu("spi2_div", SC_R_SPI_2, SC_PM_CLK_PER); 
+								---->sci_err = sc_pm_set_clock_rate(ccm_ipc_handle, clk->rsrc_id, clk->clk_type, (sc_pm_clock_rate_t *)&rate);
+
+	
+	
+	
+	
+	2.
+		clks[IMX8QM_SPI2_CLK] = imx_clk_gate_scu("spi2_clk", "spi2_div", SC_R_SPI_2, SC_PM_CLK_PER, LPCG_ADDR(LPSPI_2_LPCG), 0, 0);
+		。。
+					static struct clk_ops clk_gate_scu_ops = {
+					.prepare = clk_gate_scu_prepare,
+					.unprepare = clk_gate_scu_unprepare,
+					.enable = clk_gate_scu_enable,------------------------------------------->涉及对DMA_reg的读写
+					.disable = clk_gate_scu_disable,
+					.recalc_rate = clk_gate_scu_recalc_rate,
+				};
+		
+	第二套时钟：
+	1. clks[IMX8QM_IPG_DMA_CLK_ROOT] = imx_clk_fixed("ipg_dma_clk_root", SC_120MHZ);
+	
+	
+	
+	2.	clks[IMX8QM_SPI0_IPG_CLK]   = imx_clk_gate2_scu("spi0_ipg_clk", "ipg_dma_clk_root", LPCG_ADDR(LPSPI_0_LPCG), 16, FUNCTION_NAME(PD_DMA_SPI_0));
+									------>clk_gate2_scu_enable------------------------------------------->涉及对DMA_reg的读写
+
+	
+	
+
+tatic int clk_gate2_scu_enable(struct clk_hw *hw)
+{
+	struct clk_gate2_scu *gate = to_clk_gate2_scu(hw);
+	u32 reg;
+
+	if (!ccm_ipc_handle)
+		return -1;
+
+	if (gate->pd == NULL && gate->pd_name)
+		populate_gate_pd(gate);
+
+	if (IS_ERR_OR_NULL(gate->pd))
+		return -1;
+
+	if (gate->pd->status != GPD_STATE_ACTIVE)
+		return -1;
+
+	if (gate->reg) {
+		reg = readl(gate->reg);
+		reg |= (0x2 << gate->bit_idx);
+		writel(reg, gate->reg);
+	}
+
+	return 0;
+}
+
+
+
+&lpspi0 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        fsl,spi-num-chipselects = <2>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_lpspi0 &pinctrl_lpspi0_cs>;
+        cs-gpios = <&gpio3 5 GPIO_ACTIVE_LOW>;
+        status = "okay";
+
+        spidev@0x00 {
+             compatible = "spidev";
+             spi-max-frequency = <20000000>;
+             reg = <0>;
+        };
+};
+
+
+pinctrl_lpspi0: lpspi0grp {
+                        fsl,pins = <
+                                SC_P_SPI0_SCK_DMA_SPI0_SCK              0x0600004c
+                                SC_P_SPI0_SDO_DMA_SPI0_SDO              0x0600004c
+                                SC_P_SPI0_SDI_DMA_SPI0_SDI              0x0600004c
+                                SC_P_M41_GPIO0_00_LSIO_GPIO0_IO12       0x00000021
+                                SC_P_GPT0_COMPARE_LSIO_GPIO0_IO16       0x00000021
+                        >;
+                };
+
+pinctrl_lpspi0_cs: lpspi0cs {
+                        fsl,pins = <
+                                SC_P_SPI0_CS0_LSIO_GPIO3_IO05           0x21
+                        >;
+                };
+	
+
+
+the CR = 769
+perclk=24000000, speed=2000000, prescale =0, scldiv=10
+	
+				
+内核对应驱动位置:./drivers/spi/spi-fsl-lpspi.c
+
+中断号对应IRQ号描述：
+soc手册上的中断号，可能与a9核中的中断号不是同一个
+a9核中的0-15是ipi（inter-processer interrupt，在arm手册中也叫做SGI），16-31是ppi（private peripheral interrupt），32及其以上的是spi（shared peripheral interrupt）
+最终写到中断控制器（gic）里的中断号，是a9上的ID号
+0-15号不是外设中断，你要查看你的soc手册上的中断号是从0开始的还是从16开始的
+dts中要求ppi和spi都从0开始，因为irq-gic.c中的gic_irq_domain_xlate会根据type来加16（GIC_PPI）或32（GIC_SPI），加了16或32之后的数字就是对应于cortex-a9上的物理ID号
+例如：interrupts = <0 43 4>;，第一个数字表示类型（GIC_PPI或GIC_SPI），第二个是中断号（这个中断号并不是物理中断号），第三个表示触发方式
+写中断控制器的寄存器，在函数gic_unmask_irq中有例子
+连接到最顶层gic的外设的那些中断，调用request_irq时的中断号就是物理中断号，因为gic_init_bases里面调用irq_create_mapping时的from是16，所以是跳过了ipi的
+
+
+
+clk时钟信息：
+E:\IMX8\532_new_android\kernel_imx\drivers\clk\imx\clk-imx8qm.c
+
+DataSheet手册数据摘要：
+----------------------------------------------------------------------
+				PARAM参数控制寄存器
+PARAM[15:8] : 接收FIFO大小，大小必须为2的x次方
+PARAM[7:0]	: 发送FIFO大小，大小必须为2的X次方
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				CR控制寄存器
+CR[9]	RRF : 接收FIFO复位。置1有效
+CR[8]	RTF : 发送FIFO复位。置1有效
+CR[1]	RST : 主机逻辑复位。置1有效
+CR[0]	MEM : SPI模块使能。置1有效
+
+CR配置：9.8.0全部配置1
+0x301
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+				SR状态寄存器
+SR[24]	: 1-SPI繁忙
+		  0-SPI空闲
+SR[12]  ：0-接收FIFO没有发生溢出
+		  1-接收FIFO发送溢出。
+		  当产生溢出时，需要清除这个标志位，并且从新开始传输数据。
+SR[11]  : 0-
+		  1-发送数据超时
+		  当这个标志位置位时需要先停止传输，然后清除标志位，再重新开始传输。
+SR[10]	: 0-所有的传输还未完成
+		  1-传输完成
+		  当SPI在主机模式下。当发送FIFO为空时，则表明当前的传输完成了，此位将会置1
+SR[9]	SR_FCF: 0	-
+		  1-帧发送完成
+		  当一帧数据发送完成后，此位将会置1
+SR[8]	: 0 -
+		  1-字完成标志位
+		  当字发送或者接受完成时，此位将会被置1
+SR[1]   : 0-
+		  1-接收数据完成，此位将会被置1
+SR[0] SR_TDF	: 0-
+			1-发送数据请求标志位
+		  
+		  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			IER中断使能寄存器
+IER[13]	: 0-禁用数据匹配中断
+		  1-开启数据匹配中断
+IER[12] : 0-不开启接收数据错误中断
+		  1-开启接收数据错误中断
+IER[11] : 0-不开启发送数据错误中断
+		  1-开启发送数据错误中断
+IER[10] : 0-不开启数据发送完成中断
+		  1-开启数据发送完成中断
+IER[9]	IER_FCIE: 0-不开启帧完成中断
+		  1-开启帧完成中断
+IER[8]  : 0-不开启字完成中断
+		  1-开启字完成中断
+IER[1]	: 0-不开启接收数据完成中断
+		  1-开启接收数据完成中断
+IER[0]	IER_TDIE: 0-不开启发送数据中断
+		  1-开启发送数据中断
+		  
+kernel中配置使用位置：irq中断处理中---
+		  
+		  
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////		  
+			CFGR1寄存器
+CFGR1[27] : 在四字节传输中，这个外设片选位必须被选中
+			0-PCS[3:2]使能
+			1-PCS[3:2]失能
+
+CFGR1[26] : 输出配置，决定OUT脚在传输期间的属性
+			0-当片选有效时，输出的是上一次的值
+			1-三态
+			
+CFGR1[25:24] : 配置输出和输入引脚在单字节传输中的应用
+			00：IN脚用于IN，OUT用于OUT
+			01：IN脚用于IN和OUT双向功能
+			10：OUT脚用于IN和OUT双向功能
+			11：IN脚用于OUT，OUT用于IN，【在从机模式中需要交换这两个引脚功能】
+			
+CFGR1[18:16] : 匹配设置
+
+CFGR1[11:8] PCSPOL: 片选极性设置
+			0000-片选脚低有效
+			0001-片选脚高有效
+			
+CFGR1[1] SAMPLE : 采样节点， 在从机模式下，这个位不会被使用到，可以直接忽率
+			0-输入数据将会在SCK的边沿被采集到
+			1-输入数据将会在SCK的边沿之后被采集到
+
+CFGR1[0] :决定SPI是处于主机模式还是从机模式
+			0-从机模式
+			1-主机模式			
+
+配置：
+	1.配置为主机模式，设置[0]位，其他保持默认配置
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+				TCR寄存器：
+RSR_RXEMPTY						配置SCK时钟分频系数
+TCR_CPOL						配置LPSPI_SCK引脚极性
+TCR_CPHA						配置SCK时钟相位
+BYSW							字节交换控制，在大端格式中非常有用
+CONT							持续传输控制，一个新的命令字节将会导致PCS变成负极性
+CONTC							持续的命令控制
+RXMSK							接收掩码数据，当设置后，接收到匹配上后的数据将会被扔出ReciveFIFO
+TXMSK							掩码传输数据
+WIDTH							传输位宽：配置每个SCK期间传输的位数
+								1.支持1bit的传统双工或者半双工传输
+								2.支持2bit和4bit，对于QuadSPI内存设备非常有用，但是只支持半双工，同时TCR[TXMSK]和TCR[RXMSK]需要设置
+FRAMESE							帧长度，配置一帧由多少Bit构成，大小为=FRAMESE + 1,最小的一帧为8bit。最大为32bit，如果大于32将会被拆分成多个帧
+
+1.当写传输命令控制器或者写传输数据寄存器时都将会导致数据被写入到发送FIFO中。
+2.在主机模式下，在一个新的传输中，如果TXMSK没有被设置，那么写一个新的命令并不会初始化一个新的传输。
+  传输初始化是通过发送数据到FIFO，或者一个新的命令字节(前提是TXMSK)被设置。当LSSPI_PCS为负极性时，硬件将会清除TXMSK.
+3.在主机模式下，如果命令字节在现有的帧完成前改变了，那么现有的帧将会被打断，如果CONTC中的新命令被设置了，命令字节将会得以更新，
+  在持续的传输中，命令字节将会改变，
+4.在从机模式下，命令字节只会在LPSPI空闲的时候得到更改。
+5.避免读取寄存器的麻烦，读取发送命令寄存器将会返回当前的命令状态，在同一时间读取发送命令寄存器，会导致命令寄存器从发送FIFO中被加载
+  将会得到一个不正确的值。
+  应该在发送FIFO为空的时候读取发送命令寄存器
+  或者多次读取发送命令寄存器，并且比较这些返回值
+  
+				TCR发送命令寄存器
+TCR[31] CPOL : SCK时钟极性，只允许在两帧数据变换中间得到更改
+				0-SCK有效状态为低
+				1-SCK有效状态为高
+TCR[30] CPHA : 时钟相位
+				0-数据将会在SCK的下降沿和上升沿被捕捉
+				1-数据允许在SCK的下降沿和上升沿改变
+TCR[29:27] PRESCALE	: 	预分频值，对于所有的SPI总线传输。分频值应用于时钟配置寄存器，数值在帧间允许改动
+				000b - Divide by 1
+				001b - Divide by 2
+				010b - Divide by 4
+				011b - Divide by 8
+				100b - Divide by 16
+				101b - Divide by 32
+				110b - Divide by 64
+				111b - Divide by 128
+TCR[25-24] PCS : 外设片选引脚选择
+				00b - Transfer using LPSPI_PCS[0]
+				01b - Transfer using LPSPI_PCS[1]
+				10b - Transfer using LPSPI_PCS[2]
+				11b - Transfer using LPSPI_PCS[3]
+TCR[23] LSBF	: 高低字节优先
+				0-高位优先传输
+				1-低位优先传输
+TCR[22] BYSW	：字节交换，
+				0-字节交换失能
+				1-字节交换使能
+TCR[21] CONT 	: 持续传输
+				主机模式：持续传输会保持PCS的属性直到一个新的命令开始或者一个新的帧开始
+				0-失能
+				1-使能
+TCR[20] CONTC 	: 持续命令
+				主机模式：这个位可以允许命令字节在持续传输中得到更改
+						  初始化命令必须使能CONT = 1
+						  同时这个位也要置一 CONTC = 1
+						  增加持续命令一定要在帧大小范围内
+				0-命令开始于新的传输
+				1-命令开始于持续传输
+TCR[19] RXMSK 	: 接收数据掩码，设置过后，数据将会被屏蔽，不会存贮在接收FIFO中
+				0-一般传输
+				1-MASK传输
+TCR[18] TXMSK 	: 发送数据掩码，
+				0-一般传输
+				1-MASK传输
+TCR[17:16] 		: 发送位宽，对于2bit和4bit的发送，RXMSK和TXMSK必须被设置
+				00b - 1 bit transfer
+				01b - 2 bit transfer
+				10b - 4 bit transfer
+				11b - Reserved
+TCR[0:11] 		: 帧大小， 配置帧大小=FRAMESZ + 1
+				最小帧大小为8bit
+				
+0x40200007
+修改配置位：
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				TDR发送数据寄存器
+TDR[31:0] DATA :发送数据，注意，这个是32位，当使用8bit时，高位将会被填0
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				RSR接收状态寄存器
+RSR[1] RXEMPTY : 接收FIFO是否为空
+				0-不为空，有数据
+				1-为空
+RSR[0] SOF		: 帧开始，指明当前是第一个数据，在LPSPI_PCS被选中后
+				0-子序列，并不是帧开始
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				RDR接收数据寄存器
+RDR[31:0] DATA :32位的接收寄存器
+
+				
+ 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+当一个LPSPI被初始化为SPI总线时：
+	1.数据应该被写入FIFO
+	2.HREQ应该被禁用
+	3.LPSPI被使能
+当FRAMESE配置到达时以为着SPI总线传输的结束，或者一个新的传输命令到达传输命令FIFO的顶部时。
+HREQ输入只会在下一次LPSPI空闲时才会检查。当LPSPI完成了当前的传输后，TCR寄存器将会为空。
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				CCR寄存器
+SCKDIV							SCK分频，配置LPSPI_SCK的循环周期，=SCKDIV + 2。[SCKDIV取值为：0-255，总的数值应该是2-257]
+								当这个数值被配置为奇数时，SCK的第一个周期会比第二个长一个周期
+DBT								片选切换延迟，两个片选切换间的延迟。=DBT + 2 [DBT取值为0-255，总的数值应该是2-257]
+PCSSCK							配置最小的片选到第一个SCK间的延迟 = PCSSCK + 1。[取值为0-255]
+SCKPCS							配置最小的SCK到片选间的延迟。
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				FCR寄存器[FIFO控制寄存器]
+FCR[31:16] RXWATER: 接收FIFO水印
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				FSR-FIFO状态寄存器
+FSR[22:16] RXCOUNT : 接收FIFO大小【只读】，返回当前接收FIFO的字节数
+FSR[6:0]   TXCOUNT : 发送FIFO大小【只读】，返回当前发送FIFO的字节数
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+[    4.575622] fsl_lpspi_set_watermark: write FCR = 0x10001 
+[    4.575626] fsl_lpspi_config: write CFGR1 = 0x1 ****
+[    4.575628] fsl_lpspi_config: write CR = 0x301  ****
+[    4.575630] fsl_lpspi_set_cmd: write TCR = 0x40200007 ****
+ 
+
+引脚配置：
+1.在同一个引脚上支持半双工需要配置LPSPI_SIN和LPSPI_SOUT引脚。需要配置CFGR1[PINCFG]
+2.如果想当片选被选中(为0)时配置LPSPI_SOUT引脚为三态或者保持上一次输出的值时，需要设置CFGR1[OUTCFG]
+3.当配置成半双工模式，并且使用1bit，或者2bit和4bit传输模式时，必须配置LPSPI_OUT为三态，当LPSPI_PCS被选中时。设置CFGR1[OUTCFG]
+4.当启用4元素传输时，外设片选CFGR1[PCSCFG]必须被使能，同时CFGR1[PCSCFG]也用于失能LPSPI_PCS[3:2]的功能。
+
+时钟回环：
+
+
+从机模式：
+1.不会使用到CCR。
+2.在传输期间，要求TCR保持静止，不允许修改。
+
+
+
+				
+
+
+
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+1.uboot源码driver/spi目录下添加Ioc_Spi.c和Ioc_Spi.h文件
+	

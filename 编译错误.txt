@@ -1,0 +1,7 @@
+仪表编译报错：
+zhangdengxiang@bsp131:~/kernel$ /home/zhangdengxiang/kernel/build/relocate.sh:
+-bash: /home/zhangdengxiang/kernel/build/relocate.sh:: No such file or directory
+zhangdengxiang@bsp131:~/kernel$ home/zhangdengxiang/kernel/build/relocate.sh:
+-bash: home/zhangdengxiang/kernel/build/relocate.sh:: No such file or directory
+zhangdengxiang@bsp131:~/kernel$ /home/zhangdengxiang/kernel/build/relocate.sh
+zhangdengxiang@bsp131:~/kernel$ ./build.sh

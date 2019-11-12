@@ -1,0 +1,88 @@
+目录/home/zhangdengxiang/car_532/DoubleAndroid/device/hsae/aries/panda_imx8qm：下指定开机执行脚本
+
+配置测试GPIO
+kernel设备树文件：
+fsl-imx8qm-aries-guest-d532.dtsi
+
+
+//echo 1 > /sys/class/leds/status/brightness 
+leds {
+                compatible = "gpio-leds";
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_gpio_led_boot_test>;
+
+                status {
+                        label = "status";
+                        gpios = <&gpio0 1 0>;
+                        default-state = "off";
+                };
+        };
+		
+pinctrl_gpio_led_boot_test: gpioledgrp {
+                      fsl,pins = <
+							SC_P_SIM0_RST_LSIO_GPIO0_IO01	0x21
+                      >;
+              };
+
+
+
+开机执行脚本：
+panda_imx8qm:/sys/class/leds/status/brightness 
+
+
+板卡最终脚本
+断点添加：  write /sys/class/leds/status/brightness 1
+system/core/rootdir/init.rc:root/init.rc
+
+
+
+接上屏图7： cyttsp6_startup（532）
+
+
+adb logcat -v time -s *:V > E:\2.log
+
+git push hsae HEAD:refs/for/hs_p532mc_ga
+device_hsae_aries_attr.patch 
+	Change Sensor_109460 Node permissions
+	
+	Add Sensor_109460 HAL Code
+frameworks_native_SensorService.patch
+	Change SensorService.cpp for Sensor_109460
+	
+	
+vendor_nxp-opensource_imx.patch
+	Change Makefile for support Sensor_109460
+
+
+
+Usage : ./test-sensors-hal [OPTIONs] <sensor1,rate1> [<sensor2,rate2> ...]
+
+Options
+        -l :Show sensors list
+        -m :Show sensors metadata
+        -p :Show sensors data
+        -b timeout=<batch_ms> :Batch timeout in ms
+
+        <sensorN,rateN>
+          sensorN : Index of sensor
+          rateN   : ODR (Hz) for sensorN
+ OK!
+Start data thread... OK!
+Disabling all sensors... OK!
+Enabling sensors... OK!
+
+
+./test-sensors-hal -p sensor1,100
+./test-sensors-hal -m
+
+
+
+device/hsae/aries/panda_imx8qm/copyFile/hardware/invensense/Android.mk
+hardware/invensense/Android.mk 
+
+
+
+
+
+
+

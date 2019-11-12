@@ -1,0 +1,192 @@
+
+U-Boot 2018.03-g8e2fa82 (Nov 24 2018 - 13:29:15 +0800)
+
+CPU:   Freescale i.MX8QM revB A53 at 1200 MHz at 23C
+Model: Freescale i.MX8QM MEK
+Board: iMX8QM MEK
+Boot:  USB
+DRAM:  4 GiB
+start sata init
+TX PLL is not locked.
+tcpc_init: Can't find device id=0x51
+MMC:   FSL_SDHC: 0, FSL_SDHC: 1
+Loading Environment from MMC... Card did not respond to voltage select!
+*** Warning - No block device, using default environment
+
+Failed (-5)
+TX PLL is not locked.
+In:    serial@5a060000
+Out:   serial@5a060000
+Err:   serial@5a060000
+
+ BuildInfo:
+  - SCFW 07a6cccf, SECO-FW 31fabbff, IMX-MKIMAGE b38a9199, ATF 08ee41f
+  - U-Boot 2018.03-g8e2fa82
+
+Unknown command 'hdp' - try 'help'
+Unknown command 'hdprx' - try 'help'
+Detect USB boot. Will enter fastboot mode!
+SCSI:  Net:
+Warning: ethernet@5b040000 (eth0) using random MAC address - 7e:4e:b2:d3:b2:19
+eth0: ethernet@5b040000 [PRIME]
+Warning: ethernet@5b050000 (eth1) using random MAC address - 2e:1e:21:40:1c:ee
+, eth1: ethernet@5b050000
+Card did not respond to voltage select!
+Block device mmc 1 not supported
+bcb_rw_block, get_block_size return 0
+read_bootctl, bcb_rw_block read failed
+read command failed
+Fastboot: Normal
+Boot from USB for uuu
+
+
+Hit any key to stop autoboot:  0
+USB EHCI 1.00
+Detect USB boot. Will enter fastboot mode!
+flash target is MMC:1
+Card did not respond to voltage select!
+MMC card init failed!
+Card did not respond to voltage select!
+** Block device MMC 1 not supported
+
+
+Detect USB boot. Will enter fastboot mode! ---------------------board_fastboot_setup
+flash target is MMC:0
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Detect USB boot. Will enter fastboot mode!
+Starting download of 716800 bytes
+.....
+downloading of 716800 bytes finished
+writing to partition 'bootloader0'
+support sparse flash partition for bootloader0
+Initializing 'bootloader0'
+switch to partitions #1, OK
+mmc0(part 1) is current device
+Writing 'bootloader0'
+
+MMC write: dev # 0, block # 0, count 1400 ... 1400 blocks written: OK
+Writing 'bootloader0' DONE!
+Starting download of 34304 bytes
+
+downloading of 34304 bytes finished
+writing to partition 'gpt'
+support sparse flash partition for gpt
+Initializing 'gpt'
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Writing 'gpt'
+
+MMC write: dev # 0, block # 0, count 34 ... 34 blocks written: OK
+Writing 'gpt' DONE!
+flash backup gpt image successfully
+switch to partitions #0, OK
+mmc0(part 0) is current device
+flash target is MMC:0
+It is able to unlock device. 0
+The device is already unlocked
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Detect USB boot. Will enter fastboot mode!
+
+MMC erase: dev # 0, block # 8192, count 16 ...
+
+Caution! Your devices Erase group is 0x400
+The erase range would be change to 0x2000~0x23ff
+
+16 blocks erased: OK
+Detect USB boot. Will enter fastboot mode!
+Detect USB boot. Will enter fastboot mode!
+Starting download of 16765052 bytes
+..........................................................................
+.....................................................
+downloading of 16765052 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 16765052
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 17637376 bytes to 'prim-boot'
+Starting download of 16764980 bytes
+..........................................................................
+.....................................................
+downloading of 16764980 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 16764980
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 16764928 bytes to 'prim-boot'
+Starting download of 16764980 bytes
+..........................................................................
+.....................................................
+downloading of 16764980 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 16764980
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 16764928 bytes to 'prim-boot'
+Starting download of 16764980 bytes
+..........................................................................
+.....................................................
+downloading of 16764980 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 16764980
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 16764928 bytes to 'prim-boot'
+Starting download of 16764980 bytes
+..........................................................................
+.....................................................
+downloading of 16764980 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 16764980
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 16764928 bytes to 'prim-boot'
+Starting download of 8020300 bytes
+.............................................................
+downloading of 8020300 bytes finished
+writing to partition 'prim-boot'
+sparse flash target is mmc:0
+writing to partition 'prim-boot' for sparse, buffer size 8020300
+Flashing sparse image at offset 16384
+Flashing Sparse Image
+........ wrote 8212480 bytes to 'prim-boot'
+Starting download of 50331648 bytes
+..........................................................................
+..........................................................................
+..........................................................................
+..........................................................................
+..........................................................................
+..............
+downloading of 50331648 bytes finished
+writing to partition 'boot_a'
+support sparse flash partition for boot_a
+Initializing 'boot_a'
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Writing 'boot_a'
+
+MMC write: dev # 0, block # 1081344, count 98304 ... 98304 blocks written: OK
+Writing 'boot_a' DONE!
+Starting download of 50331648 bytes
+..........................................................................
+..........................................................................
+..........................................................................
+..........................................................................
+..........................................................................
+..............
+downloading of 50331648 bytes finished
+writing to partition 'boot_b'
+support sparse flash partition for boot_b
+Initializing 'boot_b'
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Writing 'boot_b'
+
+MMC write: dev # 0, block # 1179648, count 98304 ... 98304 blocks written: OK
+Writing 'boot_b' DONE!

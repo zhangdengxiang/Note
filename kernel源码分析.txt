@@ -1,0 +1,139 @@
+
+
+spin_lock_irqsave(&dev->power.lock, flags);
+
+#define spin_lock_irqsave(lock, flags)				\
+do {								\
+	raw_spin_lock_irqsave(spinlock_check(lock), flags);	\
+} while (0)
+
+
+#define raw_spin_lock_irqsave(lock, flags)			\
+	do {						\
+		typecheck(unsigned long, flags);	\
+		flags = _raw_spin_lock_irqsave(lock);	\
+	} while (0)
+	
+#define typecheck(type,x) \
+({	type __dummy; \
+	typeof(x) __dummy2; \
+	(void)(&__dummy == &__dummy2); \
+	1; \
+})
+
+========================================================
+
+
+
+#define list_for_each_entry(pos, head, member)				\
+	for (pos = list_first_entry(head, typeof(*pos), member);	\
+	     &pos->member != (head);					\
+	     pos = list_next_entry(pos, member))
+		 
+		 
+#define list_first_entry(ptr, type, member) \
+	list_entry((ptr)->next, type, member)
+
+
+#define list_entry(ptr, type, member) \
+	container_of(ptr, type, member)
+
+
+#define list_next_entry(pos, member) \
+	list_entry((pos)->member.next, typeof(*(pos)), member)
+	
+list_for_each_entry(xfer, &msg->transfers, transfer_list)  
+===== 
+for (xfer = list_first_entry(&msg->transfers, typeof(*xfer), transfer_list);	\
+	     &xfer->transfer_list != (&msg->transfers);					\
+	     xfer = list_next_entry(xfer, transfer_list))
+=====
+for (xfer = list_entry((&msg->transfers)->next, typeof(*xfer), transfer_list));
+		 &xfer->transfer_list != (&msg->transfers);
+		 xfer = list_entry((xfer)->member.next, typeof(*(xfer)), transfer_list))
+=====
+for (xfer = container_of((&msg->transfers)->next, typeof(*xfer), transfer_list));
+		 &xfer->transfer_list != (&msg->transfers);
+		 xfer = container_of((xfer)->transfer_list.next, typeof(*(xfer)), transfer_list))
+{
+		fsl_lpspi_setup_transfer(spi, xfer);//指定的是rx和tx函数，以及上层的一些配置
+		fsl_lpspi_set_cmd(fsl_lpspi, is_first_xfer);//设置TCR，传输命令控制寄存器
+
+		is_first_xfer = false;
+
+		ret = fsl_lpspi_transfer_one(controller, spi, xfer); //里面指定FIFO起始地址，由xfer决定
+		if (ret < 0)
+			goto complete;
+
+		msg->actual_length += xfer->len;
+}
+=====
+
+
+struct spi_message {
+	struct list_head	transfers;
+
+	struct spi_device	*spi;
+
+	unsigned		is_dma_mapped:1;
+
+	/* REVISIT:  we might want a flag affecting the behavior of the
+	 * last transfer ... allowing things like "read 16 bit length L"
+	 * immediately followed by "read L bytes".  Basically imposing
+	 * a specific message scheduling algorithm.
+	 *
+	 * Some controller drivers (message-at-a-time queue processing)
+	 * could provide that as their default scheduling algorithm.  But
+	 * others (with multi-message pipelines) could need a flag to
+	 * tell them about such special cases.
+	 */
+
+	/* completion is reported through a callback */
+	void			(*complete)(void *context);
+	void			*context;
+	unsigned		frame_length;
+	unsigned		actual_length;
+	int			status;
+
+	/* for optional use by whatever driver currently owns the
+	 * spi_message ...  between calls to spi_async and then later
+	 * complete(), that's the spi_controller controller driver.
+	 */
+	struct list_head	queue;
+	void			*state;
+
+	/* list of spi_res reources when the spi message is processed */
+	struct list_head        resources;
+};
+
+struct spi_transfer {
+	/* it's ok if tx_buf == rx_buf (right?)
+	 * for MicroWire, one buffer must be null
+	 * buffers must work with dma_*map_single() calls, unless
+	 *   spi_message.is_dma_mapped reports a pre-existing mapping
+	 */
+	const void	*tx_buf;
+	void		*rx_buf;
+	unsigned	len;
+
+	dma_addr_t	tx_dma;
+	dma_addr_t	rx_dma;
+	struct sg_table tx_sg;
+	struct sg_table rx_sg;
+
+	unsigned	cs_change:1;
+	unsigned	tx_nbits:3;
+	unsigned	rx_nbits:3;
+#define	SPI_NBITS_SINGLE	0x01 /* 1bit transfer */
+#define	SPI_NBITS_DUAL		0x02 /* 2bits transfer */
+#define	SPI_NBITS_QUAD		0x04 /* 4bits transfer */
+	u8		bits_per_word;
+	u16		delay_usecs;
+	u32		speed_hz;
+
+	struct list_head transfer_list;
+};
+
+
+
+

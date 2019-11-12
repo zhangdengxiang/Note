@@ -1,0 +1,2 @@
+调出设置：
+am start com.android.settings

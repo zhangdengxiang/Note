@@ -1,0 +1,140 @@
+1.
+U-Boot 2018.03-ga155f6f-dirty (May 22 2019 - 10:52:22 +0800)
+
+CPU:   Freescale i.MX8QM revB A53 at 1200 MHz at 25C
+Model: Freescale i.MX8QM MEK
+Board: iMX8QM MEK
+Boot:  MMC0
+DRAM:  4 GiB
+=========================================init_sequence_f End===============================
+================Time Tick = 6460813======================== 
+耗时：6460813
+去掉	display_option
+		display_text_info
+		print_cpuinfo,
+		show_board_info
+		init_func_i2c
+		show_dram_config		
+结果：
+-Boot SPL 2018.03-ga155f6f-dirty (May 13 2019 - 16:47:07 +0800)
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 5953696======================== 
+减少: 6460813 - 5953696 = 507117
+
+
+2.
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 5905323======================== 
+start sata init
+TX PLL is not locked.
+end of sata_init
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 8852071======================== 
+注释：board_init()中调用的board_gpio_init()	
+结果：
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 5797847======================== 
+start sata init
+TX PLL is not locked.
+end of sata_init
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 7137891======================== 
+减少：（8852071-5905323） - （7137891 - 5797847） = 2946748 ‬- 1340044 = 1606704‬
+
+3.
+U-Boot SPL 2018.03-ga155f6f-dirty (May 13 2019 - 16:47:07 +0800)
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 6109428======================== 
+start sata init
+TX PLL is not locked.
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 7436060======================== 
+******************************************************end of b  initr_serial() ********************************
+================Time Tick = 7580698======================== 
+耗时：7580698 - 7436060 =  144638‬
+注释：initr_serial()其他无关项
+结果：
+-Boot SPL 2018.03-ga155f6f-dirty (May 13 2019 - 16:47:07 +0800)
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 5854353======================== 
+start sata init
+TX PLL is not locked.
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 7182234======================== 
+******************************************************end of b  initr_serial() ********************************
+================Time Tick = 7326868======================== 
+耗时：7326868 -  7182234 = 144,634‬
+结论：#####################################################################无效果
+
+4.
+U-Boot SPL 2018.03-ga155f6f-dirty (May 13 2019 - 16:47:07 +0800)
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 6036024======================== 
+start sata init
+TX PLL is not locked.
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 7362236======================== 
+******************************************************end of b  initr_serial() ********************************
+================Time Tick = 7507045======================== 
+MMC:   FSL_SDHC: 0, FSL_SDHC: 1
+Loading Environment from MMC... *** Warning - bad CRC, using default environment
+
+Failed (-5)
+TX PLL is not locked.
+******************************************************end of stdio_init() ********************************
+================Time Tick = 9513579======================== 
+耗时：9513579 -  7507045 = 2006534
+修改：注释掉stdio_add_devices
+U-Boot SPL 2018.03-ga155f6f-dirty (May 13 2019 - 16:47:07 +0800)
+Trying to boot from MMC1
+Load image from MMC/SD 0x38c00
+=========================================init_sequence_f End===============================
+================Time Tick = 5881704======================== 
+start sata init
+TX PLL is not locked.
+tcpc_init: Can't find device id=0x51
+******************************************************end of board_init() ********************************
+================Time Tick = 7207922======================== 
+******************************************************end of b  initr_serial() ********************************
+================Time Tick = 7352624======================== 
+MMC:   FSL_SDHC: 0, FSL_SDHC: 1
+Loading Environment from MMC... *** Warning - bad CRC, using default environment
+Failed (-5)
+TX PLL is not locked.
+******************************************************end of stdio_init() ********************************
+================Time Tick = 9359019======================== 
+耗时：9359019 - 7352624 = 2006395
+减少：2006534 - 2006395  = 0
+结论：#####################################################################无效果
+
+5.
+
+
+
+
+
+	
+	
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+./include/autoboot.h
+./common/main.c
+
+cb_run_uboot_cmd()
+	->fastboot_setup()
+		-> board_fastboot_setup()
+		->_fastboot_setup_dev() 从环境变量中获取设备类型是MMC还是sata。
+		->_fastboot_load_partitions() 从启动脚本中读取分区信息
+		->parameters_setup()
+		
+		
+		
+			
+	cb_flash		
+		rx_process_flash	
+			process_flash_mmc
+			
+			
+		
+		
+		
+idx 0, ptn 0 name='gpt' start=0 len=2048
+idx 1, ptn 0 name='' start=0 len=0
+idx 2, ptn 0 name='all' start=0 len=61079552
+idx 3, ptn 0 name='bootloader0' start=0 len=8192
+idx 4, ptn 0 name='bootloader1' start=0 len=8192
+idx 5, ptn 1 name='prim-boot' start=16384 len=1048576
+idx 6, ptn 2 name='dtbo_a' start=1064960 len=8192
+idx 7, ptn 3 name='dtbo_b' start=1073152 len=8192
+idx 8, ptn 4 name='boot_a' start=1081344 len=98304
+idx 9, ptn 5 name='boot_b' start=1179648 len=98304
+idx 10, ptn 6 name='system_a' start=1277952 len=5120000
+idx 11, ptn 7 name='system_b' start=6397952 len=5120000
+idx 12, ptn 8 name='misc' start=11517952 len=8192
+idx 13, ptn 9 name='metadata' start=11526144 len=4096
+idx 14, ptn 10 name='presistdata' start=11530240 len=2048
+idx 15, ptn 11 name='vendor_a' start=11534336 len=229376
+idx 16, ptn 12 name='vendor_b' start=11763712 len=229376
+idx 17, ptn 13 name='userdata' start=11993088 len=45670400
+idx 18, ptn 14 name='fbmisc' start=57663488 len=2048
+idx 19, ptn 15 name='vbmeta_a' start=57667584 len=2048
+idx 20, ptn 16 name='vbmeta_b' start=57671680 len=2048

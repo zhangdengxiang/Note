@@ -4,8 +4,35 @@ scp -P 29418 -p 192.168.100.8:/hooks/commit-msg .
 cp commit-msg /usr/share/git-core/templates/hooks
 chmod +x /usr/share/git-core/templates/hooks/commit-msg
 
+单系统：
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-android -b p9.0.0_1.0.0-ga_aries
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-android -b p9.0.0_1.0.0-ga_aries
 
-repo init -u ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-android -b p9.0.0_1.0.0-ga_aries
+uuu工程模板下载地址:
+S02:192.168.100.22
+
+
+双系统：
+repo init -u ssh://zhangdengxiang@192.168.100.16:29418/manifests/imx8-android-ga  -b imx-android-pie -m hs_p532mc_ga.xml
+591双系统：
+repo init -u ssh://zhangdengxiang@192.168.100.16:29418/manifests/imx8-android-ga  -b imx-android-pie -m hs_p591mc_ga.xml
++++编译：make HARDWARE_FLASH_64G=1 -j8
+
+532kernel(591)：
+repo init -u  ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-linux -b	imx_4.14.78_1.0.0_ga_aries_gemini
+532仪表工程：
+repo init -u  ssh://zhangdengxiang@192.168.100.16:29418/manifests/imx8-linux -b venucia_532_ga_meter
+cdhs2018
+591仪表工程：
+repo init -u  ssh://zhangdengxiang@192.168.100.16:29418/manifests/imx8-linux -b venucia_591_19mc_ga_meter
+-------------------git clone http://192.168.100.16:80/manifests/imx8-linux -b venucia_591_19mc_ga_meter
+
+提交：
+git push hsae HEAD:refs/for/hs_p532mc_ga
+
+
+
+自添加编译器：:/home/zhangdengxiang/tools/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu/bin
 
 1.安卓编译的过程中会通过prebuild/sdk/tools目录中的jack-admin脚本来运行。
 2.安装必备的库：
@@ -36,7 +63,7 @@ repo init -u ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-android -b 
 		userdebug：Provides image with root access and debug, similar to "user"
 		eng：      Development image with debug tools
 	例如：
-		lunch panda_imx8qm-userdebug
+		lunch panda_imx8qm-userdebug (可能是mek更改而来的)
 4.编译：
 	 make 2>&1 | tee build-log.txt
 5.输出路径：
@@ -54,7 +81,7 @@ repo init -u ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-android -b 
 	$ make KCFLAGS=-mno-android
 	
 	命令如下：
-	make ARCH=arm64 CROSS_COMPILE=/home/zhangdengxiang/imx8/android/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android- android_defconfig
+	make ARCH=arm64 CROSS_COMPILE=/home/zhangdengxiang/imx8/532_signle/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android- android_defconfig
 	make KCFLAGS=-mno-android
 	
 8.单独编译boot.img
@@ -66,8 +93,179 @@ repo init -u ssh://zhangdengxiang@192.168.100.8:29418/manifests/imx8-android -b 
 	lunch panda_imx8qm-userdebug
 	make dtboimage -j4
 	
+	
+流程：
+产品编译相关配置在device/<厂商名>/目录下
+source build/envsetup.sh
+	->更新device/hsae/aries/vendorsetup.sh
+		->
+			add_lunch_combo panda_imx8qm-eng
+			add_lunch_combo panda_imx8qm-userdebug
+			add_lunch_combo panda_imx8qm_car-eng
+			add_lunch_combo panda_imx8qm_car-userdebug
+			add_lunch_combo panda_imx8qm_car2-eng
+			add_lunch_combo panda_imx8qm_car2-userdebug
+			
+AndroidBoard.mk
+	--> include device/fsl/common/build/kernel.mk
+		include device/fsl/common/build/uboot.mk
 
 
+
+uboot.imx包含：scfw.bin和uboot.bin
+
+
+echo gadget > /sys/devices/platform/5b0d0000.usb/ci_hdrc.0/role
+
+
+指定设备树文件的配置：
+/home/zhangdengxiang/car_532/DoubleAndroid/device/hsae/aries/panda_imx8qm/BoardConfig.mk
+
+591：
+arch/arm64/boot/dts/freescale/fsl-imx8qm-aries-guest-ds9478-cyttsp6-s02.dts
+
+532：
+fsl-imx8qm-aries-hsd156juw2-cyttsp6.dts
+fsl-imx8qm-aries-tft1p1799-cyttsp6.dts
+
+----------HARDWARE_CONFIGURATION_LEVEL
+指定UBOOT配置文件：imx8qm_mek_android_defconfig
+/home/zhangdengxiang/car_532/DoubleAndroid/device/hsae/aries/panda_imx8qm/
+
+18381430209
+513822199604097209
+
+	
+	
+Android生成文件分析：
+system.img：android系统的文件系统，里面包含了android系统的应用程序（apk），系统用到的各种库（jar, so）和资源。
+			配置文件配置文件(etc目录下)，系统命令(bin,usr/bin, xbin）。
+			该映像文件是由out/target/product/generic/system目录打包生成的，我们可以对这个目录里的东西进行定制化，
+			比如，你要想让android系统默认安装一个应用程序，那么可以将要安装的apk文件拷贝到out/target/product/generic/system/app目录下
+userdata.img：用户数据映像，里面包含有程序安装信息等，好比如是windows的C:/Program Files/目录
+
+
+adb使用：
+adb install apk
+adb uninstall apk
+	
+
+	commit e0ab254d684ce0858db23d8e24bdd9ee6704f19b
+Author: zhangdengxiang <zhangdengxiang@hangsheng.com.cn>
+Date:   Fri Jun 28 11:53:42 2019 +0800
+
+    Add Boot Time Test Functions:
+        boot_time_test()
+
+    Change-Id: I439cff3b475ba11c0d35e5c64b041325daec0504
+    Signed-off-by: zhangdengxiang <zhangdengxiang@hangsheng.com.cn>
+
+commit d5289f709dfc720603539956e9459d845ef9e998
+Author: zhangdengxiang <zhangdengxiang@hangsheng.com.cn>
+Date:   Fri Jun 28 11:47:59 2019 +0800
+
+    Disable SPL Code,And Set BOOTDELAY = 0
+
+    Change-Id: I0bffbab2d1c964f4173875d35dfa43487376eaaa
+    Signed-off-by: zhangdengxiang <zhangdengxiang@hangsheng.com.cn>
+
+commit a155f6f6e0ed07fec2c23fa8400f3c5fb7a89e00
+Author: xiaofei <xiaofei@hangsheng.com.cn>
+Date:   Fri Feb 15 18:22:47 2019 +0800
+
+    Add reset btwifi module
+
+    Change-Id: I0af72a63a061698fbd3e3696317e42e4fbff87fb
+    Signed-off-by: xiaofei <xiaofei@hangsheng.com.cn>
+	
+	
+	
+#define IOMUX_GPIO_0_1        ((3 << PADRING_IFMUX_SHIFT) | (SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
+                | (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) |(SC_PAD_28FDSOI_PS_PD << PADRING_PULL_SHIFT))
+
+
+
+/home/zhangdengxiang/car_532/DoubleAndroid/vendor/nxp-opensource/uboot-imx/board/freescale/imx8qm_mek
+
+
+
+make CROSS_COMPILE=aarch64-linux-gnu- imx8qm_mek_defconfig
+make -j8
+
+
+
+培训后看这个
+do_booti
+	booti_start
+		do_bootm_states
+			bootm_find_other ->
+				bootm_find_images
+						-->boot_get_ramdisk
+
+do_load_wrapper
+	do_load
+	
+
+initr_check_fastboot
+	fastboot_run_bootmode	
+		fastboot_get_bootmode
+			bcb_read_command
+			
+	cb_run_uboot_cmd initr_fastboot_setup		
+		fastboot_setup	
+			do_gemini_parse_ab
+			
+			
+++++++++++++++The s = 
+if mmc dev ${mmcdev}; 
+	then 
+	if test ${sec_boot} = yes; 
+	then 
+		if run loadcntr; 
+			then 
+				run mmcboot; 
+			else 
+				run netboot; 
+			fi; 
+		else if run loadimage; 
+			then 
+				run mmcboot; 
+			else run netboot; 
+			fi; fi; 
+	else 
+	booti ${loadaddr} - ${fdt_addr}; fi
+		
+
+			
+			initr_gemini_setup
+			
+error: Cannot checkout hsae/external/aosp/platform/packages/apps/CertInstaller: GitError: hsae/external/aosp/platform/packages/apps/CertInstaller rev-list ('^8538e00bb8230d2fff9d98115fd0c8ff92d9cde9', 'HEAD', '--'): fatal: bad object HEAD
+
+Traceback (most recent call last):
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/main.py", line 554, in <module>
+    _Main(sys.argv[1:])
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/main.py", line 529, in _Main
+    result = repo._Run(argv) or 0
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/main.py", line 191, in _Run
+    result = cmd.Execute(copts, cargs)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/subcmds/sync.py", line 998, in Execute
+    self._Checkout(all_projects, opt)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/subcmds/sync.py", line 556, in _Checkout
+    self._CheckoutWorker(**kwargs)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/subcmds/sync.py", line 439, in _CheckoutWorker
+    success = self._CheckoutOne(opt, project, *args, **kwargs)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/subcmds/sync.py", line 476, in _CheckoutOne
+    project.Sync_LocalHalf(syncbuf, force_sync=opt.force_sync)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/project.py", line 1423, in Sync_LocalHalf
+    lost = self._revlist(not_rev(revid), HEAD)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/project.py", line 2633, in _revlist
+    return self.work_git.rev_list(*a, **kw)
+  File "/home/zhangdengxiang/car_532/DoubleAndroid/.repo/repo/project.py", line 2828, in rev_list
+    (self._project.name, str(args), p.stderr))
+error.GitError: hsae/external/aosp/platform/packages/apps/CertInstaller rev-list ('^8538e00bb8230d2fff9d98115fd0c8ff92d9cde9', 'HEAD', '--'): fatal: bad object HEAD
+
+git apply --check born-bootloader1-partion.patch
+git apply  born-bootloader1-partion.patch
 	
 	
 

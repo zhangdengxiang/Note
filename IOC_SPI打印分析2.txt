@@ -1,0 +1,605 @@
+
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[0] = 0xa2
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[1] = 0x9
+09-20 17:28:17.528  2844  2859 E devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-20 17:28:17.528  4094  4688 E DuerOS_NewPcmRecorder: [NewPcmRecorder.run():79]------bufferRead != micBufferBytes.length-------bufferRead:0
+09-20 17:28:17.528  2844  2859 E devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[0] = 0x3
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[1] = 0x0
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[2] = 0x0
+09-20 17:28:17.528  4094  4688 E DuerOS_NewPcmRecorder: [NewPcmRecorder.run():79]------bufferRead != micBufferBytes.length-------bufferRead:0
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[3] = 0x2
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[4] = 0x0
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[5] = 0xf8
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[6] = 0x7
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[7] = 0x0
+09-20 17:28:17.528  2844  2859 E devipc  : TX Data[8] = 0x0
+
+
+
+
+09-20 17:28:02.660  2844  2859 E devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-20 17:28:02.660  2844  2859 E devipc  : TX Data[0] = 0xa2
+09-20 17:28:02.660  2844  2859 E devipc  : TX Data[1] = 0xa
+09-20 17:28:02.660  2844  2859 E devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-20 17:28:02.661  2844  2859 E devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[0] = 0x4
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[1] = 0x3
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[2] = 0x0
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[3] = 0x41
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[4] = 0x0
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[5] = 0x0
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[6] = 0x0
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[7] = 0x4d
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[8] = 0x54
+09-20 17:28:02.661  2844  2859 E devipc  : TX Data[9] = 0x52
+
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[0] = 0xa2 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[1] = 0xa                  长度
+09-20 17:14:29.312  2852  2863 E devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-20 17:14:29.312  2852  2863 E devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[0] = 0x4 				通道号
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[1] = 0x3 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[2] = 0x0 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[3] = 0x41 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[4] = 0x0 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[5] = 0x0 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[6] = 0x0 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[7] = 0x4d 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[8] = 0x54 
+09-20 17:14:29.312  2852  2863 E devipc  : TX Data[9] = 0x52 
+
+
+
+
+
+
+
+
+
+没有短接：
+BOOTLOADER: POWER UP(V190916160154)
+BOOTLOADER:A IIC OK
+BOOTLOADER:B IIC OK
+BOOTLOADER: USB INIT START
+0:CircuitVersion:1 
+BOOTLOADER: USB INIT END
+BOOTLOADER: OS UP DONE
+
+短接地线
+BOOTLOADER: POWER UP(V190916160154)
+BOOTLOADER:A IIC OK
+BOOTLOADER: MFG INIT START
+0:CircuitVersion:1 
+BOOTLOADER: MFG INIT END
+BOOTLOADER: USB INIT START
+BOOTLOADER: USB INIT END
+BOOTLOADER: OS UP DONE
+
+
+
+lrwxrwxrwx 1 root root    0 1970-01-01 08:00 gpio492 -> ../../devices/platform/5d080000.gpio/gpiochip0/gpio/gpio492
+lrwxrwxrwx 1 root root    0 1970-01-01 08:00 gpio496 -> ../../devices/platform/5d080000.gpio/gpiochip0/gpio/gpio496
+
+
+
+
+01-01 08:00:04.920  2852  2863 I devipc  : sendflwctrl
+01-01 08:00:04.920  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+01-01 08:00:04.920  2852  2863 I devipc  : TX Data[0] = 0xa1
+01-01 08:00:04.920  2852  2863 I devipc  : TX Data[1] = 0x0
+01-01 08:00:04.920  2852  2863 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+01-01 08:00:04.921  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+01-01 08:00:04.921  2852  2863 I devipc  : TX Data[0] = 0xa2
+01-01 08:00:04.921  2852  2863 I devipc  : TX Data[1] = 0xb
+01-01 08:00:04.921  2852  2863 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+01-01 08:00:04.921  2852  2852 I ServiceManagement: Removing namespace from process name android.hardware.devipc@1.0-service to devipc@1.0-service.
+01-01 08:00:04.922  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[0] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[1] = 0x10
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[2] = 0x8
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[3] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[4] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[5] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[6] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[7] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[8] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[9] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : TX Data[10] = 0x0
+01-01 08:00:04.922  2852  2863 I devipc  : +++++++++++++++++++++
+
+
+
+09-24 16:08:36.101  4300  5077 D DuerOS_PersistConnectionManager: [PersistConnectionManager.subscribe():541]subscribe called
+09-24 16:08:36.111  5073  5073 I Zygote  : seccomp disabled by setenforce 0
+09-24 16:08:36.127  5049  5049 I android_os_HwBinder: HwBinder: Starting thread pool for default::android.hardware.devipc@1.0::IDevipc
+09-24 16:08:36.130  2852  2852 I devipc  : DevipcCore::open(0xf381bb828b70)
+09-24 16:08:36.130  2852  2852 I devipc  : Channel::add(0xf381bb828b70) is added
+09-24 16:08:36.131  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[0] = 0xa2
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[1] = 0xa
+09-24 16:08:36.131  2852  2863 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-24 16:08:36.131  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[0] = 0x2
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[1] = 0x3
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[2] = 0x0
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[3] = 0x6
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[4] = 0x0
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[5] = 0x0
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[6] = 0x0
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[7] = 0x22
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[8] = 0x0
+09-24 16:08:36.131  2852  2863 I devipc  : TX Data[9] = 0x1
+09-24 16:08:36.131  2852  2863 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-24 16:08:36.136  2852  2863 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-24 16:08:36.136  2852  2863 I devipc  : TX Data[0] = 0xa1
+09-24 16:08:36.136  2852  2863 I devipc  : TX Data[1] = 0x0
+09-24 16:08:36.136  2852  2863 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-24 16:08:36.144  5049  5081 E CarUpdate: funcId ->6, ipc ---> callback data 98  0
+09-24 16:08:36.145  5049  5081 E CarUpdate: result mAckCode = 1
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler: Error removing obsolete print jobs .
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler: java.util.concurrent.TimeoutException: Cannot get spooler!
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at com.android.server.print.RemotePrintSpooler.bindLocked(RemotePrintSpooler.java:634)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at com.android.server.print.RemotePrintSpooler.getRemoteInstanceLazy(RemotePrintSpooler.java:594)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at com.android.server.print.RemotePrintSpooler.removeObsoletePrintJobs(RemotePrintSpooler.java:531)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at com.android.server.print.UserState.removeObsoletePrintJobs(UserState.java:217)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at com.android.server.print.PrintManagerService$PrintManagerImpl$3.run(PrintManagerService.java:999)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at android.os.Handler.handleCallback(Handler.java:873)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at android.os.Handler.dispatchMessage(Handler.java:99)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at android.os.Looper.loop(Looper.java:193)
+09-24 16:08:36.175  3192  3207 E RemotePrintSpooler:    at android.os.HandlerThread.run(HandlerThread.java:65)
+09-24 16:08:36.175  3192  3207 W Looper  : Slow dispatch took 20169ms android.bg h=android.os.Handler c=com.android.server.print.PrintManagerService$PrintManagerImpl$3@de25cc1 m=0
+
+
+
+
+
+09-16 15:54:17.930  2844  2855 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-16 15:54:17.930  2844  2855 I devipc  : TX Data[0] = 0xa2
+09-16 15:54:17.930  2844  2855 I devipc  : TX Data[1] = 0xa
+09-16 15:54:17.930  2844  2855 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-16 15:54:17.931  2844  2855 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[0] = 0x2
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[1] = 0x3
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[2] = 0x0
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[3] = 0x6
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[4] = 0x0
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[5] = 0x0
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[6] = 0x0
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[7] = 0x22
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[8] = 0x0
+09-16 15:54:17.931  2844  2855 I devipc  : TX Data[9] = 0x1
+09-16 15:54:17.931  2844  2855 I devipc  : ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+09-16 15:54:17.932  2844  2855 I devipc  : +++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+09-16 15:54:17.932  2844  2855 I devipc  : TX Data[0] = 0xa1
+09-16 15:54:17.932  2844  2855 I devipc  : TX Data[1] = 0x0
+09-16 15:54:17.932  2844  2855 I devipc  : +++++++++++++++++++
+
+
+
+sspi 0:0.0 200 a20b0010080000000000000000a20a02030006000000220001
+
+sspi 0:0.0 16 a100
+
+
+
+
+
+sspi 0:0.0 112 a20b001008000000000000000000    [只需要发一次]
+sspi 0:0.0 216 a20b0010080000000000000000a20a02030006000000220001a100
+000000000000
+
+./DevipcRecoveryTest -c 2 -f 3 -i 4 -n 1 -v
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0xa1 
+
+TX Data[1] = 0x0 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+DevipcCore::open(0xef0726244060)
+Channel::add(0xef0726244060) is added
+channel 2 register success
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0xa2 
+
+TX Data[1] = 0xb 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0x0 
+
+TX Data[1] = 0x10 
+
+TX Data[2] = 0x8 
+
+TX Data[3] = 0x0 
+
+TX Data[4] = 0x0 
+
+TX Data[5] = 0x0 
+
+TX Data[6] = 0x0 
+
+TX Data[7] = 0x0 
+
+TX Data[8] = 0x0 
+
+TX Data[9] = 0x0 
+
+TX Data[10] = 0x0 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+transimit::unregister(2)
+DevipcCore::close()
+transimit::unregister(2)
+DevipcCore::close()
+DevipcCore::~DevipcCore()
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0xa2 
+
+TX Data[1] = 0xa 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+mthread::join
+Channel::run END
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0x2 
+
+TX Data[1] = 0x3 
+
+TX Data[2] = 0x0 
+
+TX Data[3] = 0x6 
+
+TX Data[4] = 0x0 
+
+TX Data[5] = 0x0 
+
+TX Data[6] = 0x0 
+
+TX Data[7] = 0x22 
+
+TX Data[8] = 0x0 
+
+TX Data[9] = 0x1 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+delete m_thread
+Channel::~Channel()
+transimit::~transimit() begin
+mthread::join
+transimit::run end
+delete m_thread
+hal::~hal begin
++++++++++++++++++++++++++++++++++SPI+++++++++++++++++++++++
+
+TX Data[0] = 0xa3 
+
+TX Data[1] = 0x0 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+=> sspi 0:0.0 112 a20b001008000000000000000000
+*** num *** 
+reg: start = 0x5a000000 
+     end   = 0x5a00ffff 
+spi-max-frequency: 400000 
+spi num-cs : 0 
+spi gpio_req : 12 
+spi gpio_ack : 16 
+Read GPIO_REQ Val = 1 
+Read GPIO_ACK Val = 0 
+Set txfifosize : 64, rxfifosize : 64 
+rx_cnt: 0, tx_cnt: 0 
+Start:-----: 
+TX: 0xa2, 
+Read GPIO_REQ Val = 1 
+Rec Time Out 
+TX: 0xb, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x10, 
+Read GPIO_REQ Val = 1 
+----Rec: 0xff 
+TX: 0x8, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+
+0000FF0000000000000000000000
+=> sspi 0:0.0 216 a20b0010080000000000000000a20a02030006000000220001a100
+*** num *** 
+rx_cnt: 0, tx_cnt: 0 
+Start:-----: 
+TX: 0xa2, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0xb, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x10, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x8, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0xa2, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0xa, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x2, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x3, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x6, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x22, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x1, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0xa1, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+
+000000000000000000000000000000000000000000000000000000
+=> sspi 0:0.0 216 a20b0010080000000000000000a20a02030006000000220001a100
+*** num *** 
+rx_cnt: 0, tx_cnt: 0 
+Start:-----: 
+TX: 0xa2, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0xb, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0xa1 
+TX: 0x10, 
+Read GPIO_REQ Val = 0 
+----Rec: 0xb 
+TX: 0x8, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x2 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x3 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x6 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x62 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0xa2, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x1 
+TX: 0xa, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x1 
+TX: 0x2, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x3, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x6, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x22, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x1, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0xa1, 
+Read GPIO_REQ Val = 0 
+----Rec: 0x0 
+TX: 0x0, 
+Read GPIO_REQ Val = 1 
+----Rec: 0x0 
+
+0000A10B0203000600000062000101000000000000000000000000
+=> 
+
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0xa1 
+rx[0] = 0xb 
+rx[0] = 0x2 
+rx[0] = 0x3 
+rx[0] = 0x0 
+rx[0] = 0x6 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x62 
+rx[0] = 0x0 
+rx[0] = 0x1 
+rx[0] = 0x1 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+rx[0] = 0x0 
+ 
+ 
+RX[0] = 0Xb 
+RX[1] = 0X2 
+RX[2] = 0X3 
+RX[3] = 0X0 
+RX[4] = 0X6 
+RX[5] = 0X0 
+RX[6] = 0X0 
+RX[7] = 0X0 
+RX[8] = 0X62 
+RX[9] = 0X0 
+RX[10] = 0X1
+
+RX[0] = 0Xb 
+RX[1] = 0X2 
+RX[2] = 0X3 
+RX[3] = 0X0 
+RX[4] = 0X2 
+RX[5] = 0X0 
+RX[6] = 0X0 
+RX[7] = 0X0 
+RX[8] = 0X74 
+RX[9] = 0X0 
+RX[10] = 0X44 
+RX[11] = 0X0 
+***************************
+data[0] = 0xb 
+data[1] = 0x2 
+data[2] = 0x3 
+data[3] = 0x0 
+data[4] = 0x2 
+data[5] = 0x0 
+data[6] = 0x0 
+data[7] = 0x0 
+data[8] = 0x74 
+data[9] = 0x0 
+data[10] = 0x44 
+data[11] = 0x0 
+
+RX[0] = 0Xa 
+RX[1] = 0X2 
+RX[2] = 0X3 
+RX[3] = 0X0 
+RX[4] = 0X3 
+RX[5] = 0X0 
+RX[6] = 0X0 
+RX[7] = 0X0 
+RX[8] = 0X7f 
+RX[9] = 0X36 
+RX[10] = 0X72 
+Write Flash Error!

@@ -1,0 +1,188 @@
+包资源：
+
+#define IOCUPDATER_CHANNEL 2
+
+	
+typedef enum ipc_msg_type_e {
+   IPC_GW_REQ = 0,
+   IPC_GW_REQ_NO_REPLY,
+   IPC_GW_RSP,
+   IPC_GW_NOTIFY
+} ipc_msg_type;
+
+
+
+上层调用：
+IocUpdater::test()
+	->gateWayProxy->ipcSendRequest(channel, 2, buf, sizeof(buf), sem);
+		->SpiIpcGateWay::ipcSendRequest(sint32 channel, uint16 function, const uint8 *data, sint32 len, Semaphore *sem)
+			->m_devipc->sendNotification(function, data, len);--------------------------------------DevipcCore *m_devipc ------./frameworks/vehicle/spiipc/trans/include/DevipcCore.h
+				->
+			
+			
+			
+上层错误数据分析：
+	void DevipcCoreCallback::onNotificationArrived(uint16_t function, const uint8_t * p_data, int32_t len)
+	{
+		spiIpcNotifyCallback(function, p_data, len);
+	}
+
+
+
+class DevipcCore : public Channel {
+public:
+   DevipcCore(transimit &trans, int32_t channel);
+   virtual ~DevipcCore();
+   int open(const android::sp<IDevipcCoreCallback> &corecallback);
+   int close(const android::sp<IDevipcCoreCallback> &corecallback);
+   int close();
+   int sendNotification(uint16_t function, const uint8_t *data, int32_t len);
+   int sendRequest(uint16_t function, const uint8_t *data, int len, const android::sp<IDevipcCoreInvoke> &invoke, uint64_t context);
+   int sendRequestNoReply(uint16_t function, const uint8_t *data, int32_t len);
+   int sendReply(const RequestContext_t &req, const uint8_t *data, int32_t len);
+
+private:
+   uint16_t unique_no(void) { return (uint16_t)++mSeqNum; }
+
+private:
+   volatile uint32_t       mSeqNum;
+   transimit               &mTransimit;
+};
+
+实现：vehicle/spiipc/trans/DevipcCore.cpp
+
+	int DevipcCore::sendNotification(uint16_t function, const uint8_t *data, int32_t len)
+		->mTransimit.senddata(mChannel, header, data,  len); ----------------------transimit &mTransimit;--include/hal/transimit.h
+		
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int DevipcCore::sendNotification(uint16_t function, const uint8_t *data, int32_t len)
+{
+   ipc_msg_head header = {
+      .type = IPC_GW_NOTIFY,  //0x0003
+      .function = function,   //0X0002
+      .sequence = 0,		  //0X0000
+   };
+
+   if (g_tracelevel >= TRACE_LEVEL_2 && mChannel ==  g_tracechannel) {
+      ALOGI("DevipcCore::sendNotification(%u, %s, %d)", function, showdata(data, len), len);
+   }
+   return mTransimit.senddata(mChannel, header, data,  len);
+}
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+
+class transimit : public CCallBack, public mthread {
+public:
+   transimit();
+   virtual ~transimit();
+   int init(const devipc_info_t &info);
+   int reglistener(int channel, Channel *cChannel);
+   int unregister(int channel);
+   bool nochannel(int channel);
+   int senddata(int channel, const ipc_msg_head &header, const uint8_t *buff, int32_t len);
+   int sendflwctrl();
+   void push(int channel, uint16_t seq, const android::sp<IDevipcCoreInvoke> &invoke, uint64_t context);
+
+private:
+   int rx();
+   int tx(ipc_data_t *data);
+   int multidata(const uint8_t *buff, int bufflen);
+   int singledata(const uint8_t *buff, int bufflen);
+   int dispatchdata(ipc_data_t *data);
+   virtual void callback();
+   virtual void run();
+
+private:
+   hal            *mHal;
+   msgque         mMsgque;
+   flowCtrl       mFlowCtrl;
+   std::mutex     mMutex;
+   uint8_t        *m_buff;
+   Channel *volatile m_channel[IPC_CHANNEL_MAX_NUM];
+};
+
+
+
+int transimit::senddata(int channel, const ipc_msg_head &header, const uint8_t *buff, int32_t len)
+{
+   trans_msg_t msg;
+   ipc_data_t *ipcdata;
+
+   ipcdata = (ipc_data_t *)malloc(len + sizeof(ipc_data_t) + sizeof(ipc_msg_head) + 4); /* 4 byte for CRC*/
+   if (NULL == ipcdata) {
+      return -1;
+   }
+
+   ipcdata->channel = (uint8_t)channel;
+   ipcdata->length  = (uint8_t)(len + sizeof(ipc_msg_head));
+   memcpy(ipcdata->data, &header, sizeof(ipc_msg_head));
+   if (NULL != buff && len > 0) {
+      memcpy(&ipcdata->data[sizeof(ipc_msg_head)], buff, len); =====================非常重要
+   }
+
+   msg.content.buff = ipcdata;
+   msg.msgid = TRANS_MSG_ID_TXDATA;
+
+   return mMsgque.send(&msg, sizeof(msg));
+}
+
+transimit::senddata(int channel, const ipc_msg_head &header, const uint8_t *buff, int32_t len)
+	--->将ipc_msg_head填入包头
+		--->return mMsgque.send(&msg, sizeof(msg)); ------------msgque mMsgque; ---------include/sal/msgque.h
+		
+		
+class msgque {
+public:
+   msgque(size_t quecnt, size_t msglen);
+   virtual ~msgque();
+
+   int send(const void *buff, size_t len);
+
+   /*timeout is micro second, -1: never time out*/
+   int recieve(void *buff, size_t len, int interval = 0);
+
+private:
+   pthread_mutex_t m_mutex;
+   pthread_cond_t  m_txcond;
+   pthread_cond_t  m_rxcond;
+   char *m_msgbuff;
+
+   const size_t m_maxquecnt;
+   const size_t m_maxmsglen;
+
+   volatile size_t m_widx;
+   volatile size_t m_ridx;
+   volatile size_t m_quefree;
+};
+实现：sal/msgque.cpp
+
+int msgque::send(const void *buff, size_t len)
+{
+   size_t msglen = len;
+   memcpy(&m_msgbuff[m_widx * (sizeof(msglen) + m_maxmsglen)], &msglen, sizeof(msglen)); /* set len*/
+   memcpy(&m_msgbuff[m_widx * (sizeof(msglen) + m_maxmsglen) + sizeof(msglen)], buff, len);
+}
+
+
+
+typedef struct ipc_msg_head_s {
+   uint16_t type;
+   uint16_t function;
+   uint16_t sequence;
+} ipc_msg_head;
+
+
+
+/* not all platforms use <asm-generic/ioctl.h> or _IOC_TYPECHECK() ... */
+#define SPI_MSGSIZE(N) \
+        ((((N)*(sizeof (struct spi_ioc_transfer))) < (1 << _IOC_SIZEBITS)) \
+                ? ((N)*(sizeof (struct spi_ioc_transfer))) : 0)
+#define SPI_IOC_MESSAGE(N) _IOW(SPI_IOC_MAGIC, 0, char[SPI_MSGSIZE(N)])
+
+
+
+		
+
+
+

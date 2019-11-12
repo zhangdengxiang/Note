@@ -1,0 +1,167 @@
+IMX8QM_SPI2_CLK			--> IMX8QM_SPI2_DIV
+imx_clk_gate_scu			imx_clk_divider_scu
+
+IMX8QM_SPI2_IPG_CLK		--> IMX8QM_IPG_DMA_CLK_ROOT
+
+imx_clk_gate2_scu			imx_clk_fixed ipg_dma_clk_root
+
+
+if(!strncmp(hw->init->name,"spi0_ipg_clk", sizeof("spi0_ipg_clk"))
+               printk("***** spi0_ipg_clk prepare");
+
+
+
+const char *clk_hw_get_name(const struct clk_hw *hw)
+{
+	return hw->core->name;
+}
+
+
+
+
+clk_fixed_rate_recalc_rate				-|
+                                         |===>clks[IMX8QM_IPG_DMA_CLK_ROOT] = imx_clk_fixed("ipg_dma_clk_root", SC_120MHZ);
+clk_fixed_rate_recalc_accuracy          -|
+
+
+E:\IMX8\IOC_Updata\u-boot-imx\drivers\spi\IocSpi.c
+
+
+
+[    4.575622] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    4.575626] fsl_lpspi_config: write CFGR1 = 0x1
+[    4.575628] fsl_lpspi_config: write CR = 0x301
+[    4.575630] fsl_lpspi_set_cmd: write TCR = 0x40200007
+
+&lpspi2{
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi2 &pinctrl_lpspi2_cs>;
+	//cs-gpios = <&gpio3 10 GPIO_ACTIVE_LOW>;
+	status = "okay";
+	spidev@0x00 {
+		compatible = "spidev";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+	};
+};
+
+
+pinctrl_lpspi2: lpspi2grp {
+			fsl,pins = <
+				SC_P_SPI2_SCK_DMA_SPI2_SCK		0x0600004c
+				SC_P_SPI2_SDO_DMA_SPI2_SDO		0x0600004c
+				SC_P_SPI2_SDI_DMA_SPI2_SDI		0x0600004c
+			>;
+		};
+
+		pinctrl_lpspi2_cs: lpspi2cs {
+			fsl,pins = <
+				SC_P_SPI2_CS0_LSIO_GPIO3_IO10		0x40000021
+			>;
+		};
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		----------------The spi->mode = 1
+[    5.636948] ----------------The spi->chip_select = 0
+[    5.636965] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    5.636967] fsl_lpspi_config: write CFGR1 = 0x1
+[    5.636968] fsl_lpspi_config: write CR = 0x301
+[    5.636970] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[    6.038137] random: fast init done
+[    6.118719] gemini_sysfs: android started
+[    6.189132] CVMC-CORE[T]: event_mgr_req_init mgr init req 5
+[    6.195510] CVMC-CORE[T]: event_shared_resp_ref Shared memory response 5-0 section 1 page 1
+[    6.195553] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 5-0 index 0
+[    6.344362] CVMC-CORE[T]: event_mgr_req_init mgr init req 2
+[    6.369421] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 437 NULL context
+[    6.390420] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 455 NULL context
+[    6.406510] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 254 NULL context
+[    6.419172] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 252 NULL context
+[    6.453694] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 438 NULL context
+[    6.464106] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 456 NULL context
+[    6.480020] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 255 NULL context
+[    6.493059] CVMC-CLK-PROXY[E]: hw_clk_proxy_response clkop type 8 clk id 253 NULL context
+[    7.908720] switch cluster 0 cpu-freq governor to schedutil
+[    7.911012] switch cluster 1 cpu-freq governor to schedutil
+[    7.930687] CVMC-CORE[T]: event_mgr_req_init mgr init req 6
+[    7.959843] muc_i2c_bus_read->64, regaddr:0x200 fail. rc:0xfffffffb
+[    7.969538] muc_i2c_bus_read->64, regaddr:0x300 fail. rc:0xfffffffb
+[    7.983614] muc_i2c_bus_read->64, regaddr:0x400 fail. rc:0xfffffffb
+[    8.002472] muc_i2c_bus_read->64, regaddr:0x200 fail. rc:0xfffffffb
+[    8.010756] muc_i2c_bus_read->64, regaddr:0x300 fail. rc:0xfffffffb
+[    8.023179] muc_i2c_bus_read->64, regaddr:0x400 fail. rc:0xfffffffb
+[    8.037834] ----------------The spi->mode = 1
+[    8.037839] ----------------The spi->chip_select = 0
+[    8.037858] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    8.037860] fsl_lpspi_config: write CFGR1 = 0x1
+[    8.037862] fsl_lpspi_config: write CR = 0x301
+[    8.037864] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[    8.538257] ----------------The spi->mode = 1
+[    8.538267] ----------------The spi->chip_select = 0
+[    8.538288] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    8.538290] fsl_lpspi_config: write CFGR1 = 0x1
+[    8.538293] fsl_lpspi_config: write CR = 0x301
+[    8.538296] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[    9.038555] ----------------The spi->mode = 1
+[    9.038562] ----------------The spi->chip_select = 0
+[    9.038577] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    9.038579] fsl_lpspi_config: write CFGR1 = 0x1
+[    9.038581] fsl_lpspi_config: write CR = 0x301
+[    9.038583] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[    9.538849] ----------------The spi->mode = 1
+[    9.538856] ----------------The spi->chip_select = 0
+[    9.538871] fsl_lpspi_set_watermark: write FCR = 0x10001
+[    9.538874] fsl_lpspi_config: write CFGR1 = 0x1
+[    9.538876] fsl_lpspi_config: write CR = 0x301
+[    9.538878] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[   10.039131] ----------------The spi->mode = 1
+[   10.039138] ----------------The spi->chip_select = 0
+[   10.039153] fsl_lpspi_set_watermark: write FCR = 0x10001
+[   10.039155] fsl_lpspi_config: write CFGR1 = 0x1
+[   10.039158] fsl_lpspi_config: write CR = 0x301
+[   10.039160] fsl_lpspi_set_cmd: write TCR = 0x40200007
+1000 - 00015436: waitForAck error
+
+1000 - 00015603: dev-ipc: Send flowctrl message error
+[   10.539492] ----------------The spi->mode = 1
+[   10.539500] ----------------The spi->chip_select = 0
+[   10.539519] fsl_lpspi_set_watermark: write FCR = 0x10001
+[   10.539522] fsl_lpspi_config: write CFGR1 = 0x1
+[   10.539524] fsl_lpspi_config: write CR = 0x301
+[   10.539526] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[   11.039812] ----------------The spi->mode = 1
+[   11.039819] ----------------The spi->chip_select = 0
+[   11.039834] fsl_lpspi_set_watermark: write FCR = 0x10001
+[   11.039837] fsl_lpspi_config: write CFGR1 = 0x1
+[   11.039839] fsl_lpspi_config: write CR = 0x301
+[   11.039841] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[   11.317823] CVMC-CORE[T]: event_mgr_req_init mgr init req 8
+[   11.317955] CVMC-CORE[T]: event_shared_resp_ref Shared memory response 8-0 section 8 page 8
+[   11.317986] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 0
+[   11.318007] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 1
+[   11.318028] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 2
+[   11.318048] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 3
+[   11.318069] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 4
+[   11.318089] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 5
+[   11.318109] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 6
+[   11.318154] CVMC-CORE[T]: event_shared_resp_shinfo Shared memory info response 8-0 index 7
+[   11.540149] ----------------The spi->mode = 1
+[   11.540156] ----------------The spi->chip_select = 0
+[   11.540173] fsl_lpspi_set_watermark: write FCR = 0x10001
+[   11.540176] fsl_lpspi_config: write CFGR1 = 0x1
+[   11.540178] fsl_lpspi_config: write CR = 0x301
+[   11.540180] fsl_lpspi_set_cmd: write TCR = 0x40200007
+[   12.040473] ----------------The spi->mode = 1
+

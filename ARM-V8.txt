@@ -15,5 +15,18 @@ PGD的基地址<_
 	  |		 \-TTBR1_EL1（Translation Table Base Register 1 (EL1) 当虚拟地址的最高位63bit为0时使用。代表的是地址用于用户空间
       |
 	  v   		 
-	  |---->:这个基地址实际也就是0级页表的基地址，L0 		 
-	     		 
+	  |---->:这个基地址实际也就是0级页表的基地址，L0 	
+
+
+
+
+
+
+
+Atomicity：原子操作
+仅仅是在本地CPU上是原子操作的，但是并不代表不被其他CPU所打断。
+Coherent order--->
+
+
+
+IPC:

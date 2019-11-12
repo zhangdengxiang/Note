@@ -1,0 +1,20 @@
+109460
+
+532_kernel提交记录：
+1：
+Add driver for Sensor_109460, Add Source Code:
+	drivers/iio/imu/inv_mpu/*
+	include/linux/iio/imu/mpu.h
+Update arch/arm64/configs/android_defconfig:
+	+CONFIG_INV_MPU_IIO_IAM20680=y
+Update drivers/iio/imu/Kconfig
+	+source "drivers/iio/imu/inv_mpu/Kconfig"
+Update drivers/iio/imu/Makefile
+	+obj-y += inv_mpu/
+Update 532_prj dts files, With i2c4 Node, The Sensor Address is 0x69: 
+	fsl-imx8qm-aries-guest-hsd156juw2-cyttsp6.dts 
+	fsl-imx8qm-aries-guest-tft1p1799-cyttsp6.dts
+	fsl-imx8qm-aries-guest.dtsi
+	
+git push hsae HEAD:refs/for/p9.0.0_1.0.0-ga_aries_gemini
+	

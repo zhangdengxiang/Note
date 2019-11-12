@@ -1,0 +1,201 @@
+Android-uboot启动时间
+GPIO03_IO00:J182
+#define SC_P_MCLK_IN0_LSIO_GPIO3_IO00                           SC_P_MCLK_IN0 
+                                                                       |
+                                                                      114
+
+
+/arch/arm/include/asm/arch-imx8/gpio.h:20:#define IMX_GPIO_NR(port, index)             (((port)*32)+((index)&31))
+#define BOOT_TIME_TEST1 IMX_GPIO_NR(0, 1)   == 1
+
+static int boot_time_test(void)
+{
+	gpio_request(BOOT_TIME_TEST0, "boot_time_test");
+	gpio_direction_output(BOOT_TIME_TEST0, 1);
+	
+	gpio_request(BOOT_TIME_TEST1, "boot_time_test");
+	gpio_direction_output(BOOT_TIME_TEST1, 1);
+	
+	return 0;
+}
+
+
+/home/zhangdengxiang/car_532/SignalAndroid/vendor/nxp-opensource/uboot-imx
+
+#include <common.h>
+#include <malloc.h>
+#include <errno.h>
+#include <netdev.h>
+#include <fsl_ifc.h>
+#include <fdt_support.h>
+#include <linux/libfdt.h>
+#include <environment.h>
+#include <fsl_esdhc.h>
+#include <i2c.h>
+
+#include <asm/io.h>
+#include <asm/gpio.h>
+#include <asm/arch/clock.h>
+#include <asm/mach-imx/sci/sci.h>
+#include <asm/arch/imx8-pins.h>
+#include <dm.h>
+#include <imx8_hsio.h>
+#include <usb.h>
+#include <asm/arch/iomux.h>
+#include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/video.h>
+#include <asm/arch/video_common.h>
+#include <power-domain.h>
+#include "../common/tcpc.h"
+#include <cdns3-uboot.h>
+#include <asm/arch/lpcg.h>
+
+
+uboot相关信息：
+	代码段起始地址：#define CONFIG_SYS_TEXT_BASE		0x81200000
+	
+
+abortboot-->
+		__abortboot---->
+				do_boota
+				
+
+
+
+struct andr_img_hdr {
+	char magic[ANDR_BOOT_MAGIC_SIZE];
+
+	u32 kernel_size;	/* size in bytes */
+	u32 kernel_addr;	/* physical load addr */
+
+	u32 ramdisk_size;	/* size in bytes */
+	u32 ramdisk_addr;	/* physical load addr */
+
+	u32 second_size;	/* size in bytes */
+	u32 second_addr;	/* physical load addr */
+
+	u32 tags_addr;		/* physical addr for kernel tags */
+	u32 page_size;		/* flash page size we assume */
+	u32 header_version;
+
+	/* operating system version and security patch level; for
+	 * version "A.B.C" and patch level "Y-M-D":
+	 * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
+	 * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
+	 * os_version = ver << 11 | lvl */
+	u32 os_version;
+
+	char name[ANDR_BOOT_NAME_SIZE]; /* asciiz product name */
+
+	char cmdline[ANDR_BOOT_ARGS_SIZE];
+
+	u32 id[8]; /* timestamp / checksum / sha1 / etc */
+
+	/* Supplemental command line data; kept here to maintain
+	 * binary compatibility with older versions of mkbootimg */
+	char extra_cmdline[ANDR_BOOT_EXTRA_ARGS_SIZE];
+	uint32_t recovery_dtbo_size;   /* size of recovery dtbo image */
+	uint64_t recovery_dtbo_offset; /* offset in boot image */
+	uint32_t header_size;   /* size of boot image header in bytes */
+} __attribute__((packed));
+		
+
+
+int gpio_request(unsigned gpio, const char *label)
+{
+	unsigned int port = GPIO_TO_PORT(gpio);
+	if (port >= ARRAY_SIZE(gpio_ports))
+		return -1;
+	if (RDC_CHECK(port))
+		return -1;
+	return 0;
+}
+GPIO_TO_PORT(gpio);
+#define GPIO_TO_PORT(n)		((n / 32) - 1)
+#define RDC_CHECK(x) imx_rdc_check_permission(gpio_rdc[x], 0)
+int imx_rdc_check_permission(int per_id, int dom_id)
+{
+	struct rdc_regs *imx_rdc = (struct rdc_regs *)RDC_BASE_ADDR;  //#define RDC_BASE_ADDR		0x303D0000
+	u32 reg;
+
+	reg = readl(&imx_rdc->pdap[per_id]);
+	if (!(reg & RDC_PDAP_DRW_MASK(dom_id)))
+		return -EACCES;  /*No access*/
+
+	return 0;
+}
+struct rdc_regs {
+	u32	vir;		/* Version information */
+	u32	reserved1[8];
+	u32	stat;		/* Status */
+	u32	intctrl;	/* Interrupt and Control */
+	u32	intstat;	/* Interrupt Status */
+	u32	reserved2[116];
+	u32	mda[27];		/* Master Domain Assignment */
+	u32	reserved3[101];
+	u32	pdap[118];		/* Peripheral Domain Access Permissions */
+	u32	reserved4[138];
+	struct {
+		u32 mrsa;		/* Memory Region Start Address */
+		u32 mrea;		/* Memory Region End Address */
+		u32 mrc;		/* Memory Region Control */
+		u32 mrvs;		/* Memory Region Violation Status */
+	} mem_region[52];
+};
+#define RDC_PDAP_DW_SHIFT(domain)	((domain) << 1)
+#define RDC_PDAP_DR_SHIFT(domain)	(1 + RDC_PDAP_DW_SHIFT(domain))
+#define RDC_PDAP_DW_MASK(domain)	(1 << RDC_PDAP_DW_SHIFT(domain))
+#define RDC_PDAP_DR_MASK(domain)	(1 << RDC_PDAP_DR_SHIFT(domain))
+#define RDC_PDAP_DRW_MASK(domain)	(RDC_PDAP_DW_MASK(domain) | \
+
+
+
+int gpio_direction_output(unsigned gpio, int value)
+{
+	int ret = gpio_set_value(gpio, value);
+
+	if (ret < 0)
+		return ret;
+
+	return mxc_gpio_direction(gpio, MXC_GPIO_DIRECTION_OUT);
+}
+
+
+
+
+
+
+
+
+struct gpio_regs {
+        u32 gpio_dr;    /* data */
+        u32 gpio_dir;   /* direction */
+        u32 gpio_psr;   /* pad satus */
+};
+
+static int boot_time_test(void)
+{
+        struct gpio_regs *regs;
+        u32 l;
+        regs = (struct gpio_regs *)0x5d080000; //regs = GPIO1_BASE_ADDR; 0x5D080000
+      //  l = readl(&regs->gpio_dr);
+        l = regs->gpio_dr;
+        l |= 1 << 1;
+       // writel(l, &regs->gpio_dr);
+        regs->gpio_dr = l;
+
+
+       // l = readl(&regs->gpio_dir);
+        l = regs->gpio_dir;
+        l |= 1 << 1;
+       // writel(l, &regs->gpio_dir);
+        regs->gpio_dir = l;
+
+        return 0;
+}
+
+
+
+
+
+

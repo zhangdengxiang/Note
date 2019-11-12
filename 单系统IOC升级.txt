@@ -1,0 +1,4 @@
+单系统：
+uboot配置文件：imx8qm_mek_android_defconfig
+uuu配置文件：imx8qm_mek_android_uuu_defconfig
+uuu配置文件较uboot配置文件多一个配置：CONFIG_CI_UDC

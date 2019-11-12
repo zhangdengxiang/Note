@@ -1,0 +1,6 @@
+1.
+添加头文件：
+./drivers/iio/imu/inv_mpu/inv_mpu_ring.c
+#include <linux/iio/buffer.h>
+#include <linux/iio/buffer_impl.h>
+

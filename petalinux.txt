@@ -1,0 +1,66 @@
+QT库文件打包到petalinux文件系统：
+	
+0--petalinux工程目录下创建库文件
+	petalinux-create -t libs -n qt-5.2.1 --enable
+	将会创建components/libs/qt-5.2.1目录。我们后期的库文件将会拷贝到这里
+	
+1--删除掉产生的模板库文件
+	cd components/libs/qt-5.2.1
+	rm libqt*
+	
+2--拷贝QT库文件和插件到此目录下(即将QT库文件拷贝到我们创建的需要打包的目录下)
+	cp -Pr /opt/Qt/5.2.1/lib .
+	cp -Pr /opt/Qt/5.2.1/plugins/ ./lib/
+	拷贝测试程序到bin下
+	mkdir bin
+	cp /opt/Qt/5.2.1/examples/widgets/painting/pathstroke/pathstroke bin/pathstroke
+	cp /opt/Qt/5.2.1/examples/widgets/mainwindows/mainwindow/mainwindow bin/mainwindow
+
+3--需要在rootfs中设置环境变量，创建profile.qt-5.2.1文件
+	vi profile.qt-5.2.1
+	添加以下代码
+	export QT_PLUGIN_PATH=/usr/lib/plugins
+	export QT_QPA_FONTDIR=/usr/lib/fonts
+	export QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/plugins/platforms
+	export QT_QPA_PLATFORM=linuxfb
+	export QT_QPA_GENERIC_PLUGINS=tslib:/dev/input/event0 [触摸屏，可以根据需要添加]
+	
+4--修改petaLinux 的component 目录下的 Makefile，安装QT库文件到目标系统
+	修改：
+	ifndef PETALINUX
+	$(error "Error: PETALINUX environment variable not set. Try to source the settings.sh file")
+	endif
+	
+	include libs.common.mk
+	
+	LIB=libqt_5_2_1
+	
+	all: build install
+	
+	.PHONY: build
+	build:
+	
+	install:
+		#Install libraries and fonts to the rootfs.
+	
+		mkdir -p $(TARGETDIR)/usr/lib
+		USER=your_user_name
+		GROUP=your_user_group
+		rsync -rav ./bin/* $(TARGETDIR)/usr/bin/
+		rsync -rav ./lib/* $(TARGETDIR)/usr/lib/
+	
+		#Install the script to ensure the font directory is properly specified.
+		mkdir -p $(TARGETDIR)/etc/profile.d
+		cp profile.qt-5.2.1 $(TARGETDIR)/etc/profile.d/profile.qt-5.2.1
+	
+	clean:
+
+5--添加配置，支持libstdc++6
+	petalinux-config -c rootfs 
+	
+	
+QT库文件过大，导致image.ub过大解决方法：
+	1-SD卡格式化为2个分区：
+		第一个分区FAT32格式：至少64M
+						   ：将会包含Bootloader，设备树文件，kernel，分区名字为BOOT
+		第二个分区EXT4格式：将会包含文件系统，分区名字为RootFS		

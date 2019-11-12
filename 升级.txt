@@ -1,0 +1,24 @@
+新单系统linux
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-linux  -b imx_4.14.98_2.0.1_ga_aries
+新单系统提交工程：
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-linux  -b imx_4.14.78_1.0.0_ga_aries_gemini_d532
+
+
+NEW:
+linux：
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-linux  -b imx_4.14.98_2.0.1_ga_taurus
+新单Android：
+repo init -u ssh://192.168.100.8:29418/manifests/imx8-android -b p9.0.0_2.0.1-ga_taurus
+UUU工具地址：
+\\192.168.100.5\team\bsp\GA\4.14.98
+
+
+
+git导出补丁：
+	1.git format-patch commitid
+
+
+单系统后期设备树文件：
+fsl-imx8qm-aries-ds9478-cyttsp6.dts
+	->fsl-imx8qm-aries.dtsi
+		->fsl-imx8qm.dtsi[新版本自带]但是有更改

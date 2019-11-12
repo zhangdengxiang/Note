@@ -1,0 +1,76 @@
+/arch/arm/lib/crt0_64.S 开始进入C函数流程：_main
+_main主演实现功能：
+	1.初始化运行环境，以便于调用board_init_f()函数，此环境提供一个stack用于存储GD数据结构。
+	2.调用函数board_init_f()，初始化系统内存。当系统内存不可用时，
+	3.。。。
+	4.建立最终的运行环境调用：board_init_r(),这个环境里面包含BSS,data段。
+	5.调用c_runtime_cpu_setup，初始化CPU指向的关键内存
+	7.跳转到分支：board_init_r()
+
+_main开始调用board_init_f函数
+board_init_f路径：common/board_f.c 
+board_init_f函数主要工作：
+	依次执行函数：
+		--->>>init_fnc_t init_sequence_f[]
+------------------------------------------init_fnc_t init_sequence_f[]流程---------------------------------
+-----static int setup_mon_len(void)
+	主要作用：setup_mon_len功能是根据链接文件中的__bss_end 和_start标签计算uboot的大小，并初始化给gd->mon_len
+-----CONFIG_OF_CONTROL：有定义 
+	路径：lib/fdtdec.c
+	fdtdec_setup()
+	主要作用：设备树地址极其解压
+------initf_malloc()
+	路径：common/dlmalloc.c 
+	主要作用：设置gd->malloc_limit和gd->malloc_ptr参数
+------log_ini
+	路径:common/log.c 
+	主要作用： 将.u_boot_list_2_log_driver_3和.u_boot_list_2_log_driver_1之间的所有struct log_driver结构体都加入到了gd->log_head的循环链表中，并初始化gd->default_log_level和gd->log_fmt
+------- 
+
+
+
+board_f.c
+board_early_init_f函数：
+
+
+
+
+
+
+
+G:\uboot\common\main.c 
+--G:\uboot\common\autoboot.c			run_command_list(s, -1, 0);
+	--/common/cli.c文件中：
+	--int run_command_list(const char *cmd, int len, int flag)
+
+
+
+
+G:\uboot\common\cli_hush.c
+
+ cli_loop(void) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ ======================
+ G:\uboot\drivers\usb\gadget\f_fastboot.c
+ 
+ 
+  avb_ab_flow_fast()耗时严重
+	
+
+	
+		
+		
+
+

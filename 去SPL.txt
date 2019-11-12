@@ -1,0 +1,112 @@
+﻿链接脚本：arch/arm/cpu/armv8/u-boot-spl.ld
+
+SUPPORT_SPL指定的是CONFIG_SUPPORT_SPL
+Symbol: SUPPORT_SPL [=y]                                                                                                                                                                                                          │
+  │ Type  : boolean                                                                                                                                                                                                                   │
+  │   Defined at common/spl/Kconfig:3      
+
+
+CONFIG_SPL_BUILD
+在编译spl过程中，会配置
+project-x/scripts/Makefile.spl中定义了如下    
+
+qm：2个都有
+
+./vendor/nxp-opensource/uboot-imx/scripts/kconfig/confdata.c这个文件会自动去解析生成UBOOT的.config配置文件
+自动执行以下配置
+arch/../configs/imx8qm_mek_android_defconfig
+arch/../configs/imx8qxp_mek_android_defconfig
+arch/../configs/imx8qm_mek_android_uuu_defconfig
+arch/../configs/imx8qxp_mek_android_uuu_defconfig
+
+"CONFIG_SPL_LDSCRIPT"定义文件：
+./include/configs/imx8mm_evk.h ->>>:#define CONFIG_SPL_LDSCRIPT		"arch/arm/cpu/armv8/u-boot-spl.lds" 
+
+
+
+
+
+development/vndk/tools/header-checker/utils/create_reference_dumps.py
+
+
+带SPL：
+1,272,832
+无SPL：
+
+1.注释掉宏：/include/configs/imx8qm_mek.h
+			#define CONFIG_MXC_GPIO
+			预计耗时200m
+2../common/stdio.c   +375
+	# if defined(CONFIG_VIDEO) || defined(CONFIG_CFB_CONSOLE)
+	drv_video_init ()
+	分析：
+	CONFIG_VIDEO         ---->  imx8qm_mek_android_defconfig
+	CONFIG_CFB_CONSOLE   ---->  /include/configs/pico-imx7d.h
+	
+3.
+	./common/main.c ----...>
+		bootdelay_process()
+			-> 
+				abortboot(int bootdelay)
+				->
+					./common/autoboot.c:223:   
+					__abortboot(bootdelay)     
+						-->printf("Hit any key to stop autoboot: %2d ", bootdelay);
+	解决：
+	注释：./common/main.c ->	bootdelay_process()
+
+4.注释宏：CONFIG_SCSI_AHCI_PLAT
+	路径：
+	
+	
+	
+	
+	
+	
+	
+
+static int  printf_time(void)
+{
+    printf("================Time Tick = %ld======================== \n",  get_ticks());
+    return 0;
+}
+
+
+
+循环于：
+	s =  boota mmc0 
+	run_command_list(s, -1, 0);	
+			...
+			  -->parse_string_outer(buff, FLAG_PARSE_SEMICOLON);
+				--->parse_stream_outer()
+				
+基于课题需要，本论文主要设计了一套以 FPGA 作为控制单元的线阵 CCD 光谱采集系统，
+设计和搭建了相应的实验环境，并通过实验对该光谱采集系统的性能进行验证。
+
+
+#define GPIO_TEST      IMX_GPIO_NR(0, 1)
+static iomux_cfg_t test_gpio = SC_P_SIM0_RST | MUX_MODE_ALT(3) | MUX_PAD_CTRL(GPIO_PAD_CTRL);
+
+
+static void gpio_power_on(void)
+{
+	sc_pm_set_resource_power_mode(gd->arch.ipc_channel_handle, SC_R_BOARD_R1, SC_PM_PW_MODE_ON);
+	sc_pm_set_resource_power_mode(gd->arch.ipc_channel_handle, SC_R_GPIO_1, SC_PM_PW_MODE_ON);
+}
+
+gpio_power_on();
+
+int boot_time_test(void)
+{
+
+	imx8_iomux_setup_pad(test_gpio);
+
+	gpio_request(GPIO_TEST, "gpio_01");
+	gpio_direction_output(GPIO_TEST, 1);
+}
+
+
+
+
+
+

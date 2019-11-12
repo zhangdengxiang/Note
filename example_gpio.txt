@@ -1,0 +1,266 @@
+diff --git a/board/freescale/imx8qm_mek/imx8qm_mek.c b/board/freescale/imx8qm_mek/imx8qm_mek.c
+index a51fb11..b7df426 100644
+--- a/board/freescale/imx8qm_mek/imx8qm_mek.c
++++ b/board/freescale/imx8qm_mek/imx8qm_mek.c
+@@ -101,7 +101,7 @@ int board_early_init_f(void)
+ #include <miiphy.h>
+
+ static iomux_cfg_t pad_enet1[] = {
+-       SC_P_ENET1_RGMII_RX_CTL | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
++       //SC_P_ENET1_RGMII_RX_CTL | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+        SC_P_ENET1_RGMII_RXD0 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+        SC_P_ENET1_RGMII_RXD1 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+        SC_P_ENET1_RGMII_RXD2 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+@@ -198,6 +198,9 @@ int board_phy_config(struct phy_device *phydev)
+ #define BB_GPIO_3V3_2 IMX_GPIO_NR(4, 24)
+ #define BB_GPIO_3V3_3 IMX_GPIO_NR(4, 23)
+
++#define WIFI_ENABLE IMX_GPIO_NR(6, 17)
++#define BT_ENABLE IMX_GPIO_NR(6, 19)
++
+ /* 3 for gpio iomux */
+ #define LVDS0_PAD_CTRL         ((3 << PADRING_IFMUX_SHIFT) | (SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
+                | (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) |(SC_PAD_28FDSOI_PS_PD << PADRING_PULL_SHIFT))
+@@ -207,9 +210,14 @@ static iomux_cfg_t lvdsx_pdb[] = {
+        SC_P_LVDS0_GPIO01 | MUX_PAD_CTRL(LVDS0_PAD_CTRL),
+        SC_P_LVDS1_GPIO01 | MUX_PAD_CTRL(LVDS1_PAD_CTRL),
+ };
++static iomux_cfg_t wifi_bt[] = {
++       SC_P_ENET1_RGMII_RX_CTL | MUX_MODE_ALT(3) | MUX_PAD_CTRL(GPIO_PAD_CTRL),
++       SC_P_ENET1_RGMII_RXD1 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(GPIO_PAD_CTRL),
++};
+ static void board_gpio_init(void)
+ {
+        imx8_iomux_setup_multiple_pads(lvdsx_pdb, ARRAY_SIZE(lvdsx_pdb));
++       imx8_iomux_setup_multiple_pads(wifi_bt, ARRAY_SIZE(wifi_bt));
+        /* Enable BB 3V3 */
+        gpio_request(BB_GPIO_3V3_1, "bb_3v3_1");
+        gpio_direction_output(BB_GPIO_3V3_1, 1);
+@@ -237,6 +245,12 @@ static void board_gpio_init(void)
+        /* enable MIPI SAS boards */
+        gpio_request(MIPI_ENABLE, "mipi_enable");
+        gpio_direction_output(MIPI_ENABLE, 1);
++       /* enable WIFI  boards */
++       gpio_request(BT_ENABLE, "bt_enable");
++       gpio_direction_output(BT_ENABLE, 1);
++       gpio_request(WIFI_ENABLE, "wifi_enable");
++       gpio_direction_output(WIFI_ENABLE, 1);
++
+ }
+ #endif
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+#include <fdt_support.h>
+#include <linux/libfdt.h>
+#include <environment.h>
+#include <fsl_esdhc.h>
+#include <i2c.h>
+#include "pca953x.h"
+
+
+
+
+#include <imx8_hsio.h>
+#include <usb.h>
+#include <asm/mach-imx/video.h>
+#include <asm/arch/video_common.h>
+#include <power-domain.h>
+#include "../common/tcpc.h"
+#include <cdns3-uboot.h>
+#include <asm/arch/lpcg.h>
+
+
+#include <common.h>
+#include <console.h>
+#include <environment.h>
+#include <dm.h>
+#include <fdtdec.h>
+#include <fs.h>
+#include <i2c.h>
+#include <initcall.h>
+#include <init_helpers.h>
+#include <malloc.h>
+#include <mapmem.h>
+#include <os.h>
+#include <post.h>
+#include <relocate.h>
+#include <spi.h>
+#include <status_led.h>
+#include <timer.h>
+#include <trace.h>
+#include <video.h>
+#include <watchdog.h>
+#ifdef CONFIG_MACH_TYPE
+#include <asm/mach-types.h>
+#endif
+#if defined(CONFIG_MP) && defined(CONFIG_PPC)
+#include <asm/mp.h>
+#endif
+#include <asm/io.h>
+#include <asm/sections.h>
+#include <dm/root.h>
+#include <linux/errno.h>
+#include <asm/io.h>
+#include <asm/gpio.h>
+#include <asm/arch/imx8-pins.h>
+#include <asm/arch/iomux.h>
+#include <asm/arch/clock.h>
+#include <asm/mach-imx/sci/sci.h>
+#include <asm/arch/sys_proto.h>
+
+
+
+
+G:\uboot\drivers\gpio\mxc_gpio.c
+G:\uboot\drivers\gpio\mxc_gpio.c
+
+直接写寄存器：
+
+#include <asm/arch-imx8/gpio.h>
+#include <asm/arch-imx8/imx-regs.h>
+#define BOOT_TIME_TEST1 IMX_GPIO_NR(0, 1)
+#define GPIO_TO_PORT(n)		((n / 32) - 1)
+
+/* GPIO port description */
+static unsigned long gpio_ports[] = {
+	[0] = GPIO1_BASE_ADDR,
+	[1] = GPIO2_BASE_ADDR,
+	[2] = GPIO3_BASE_ADDR,
+#if defined(CONFIG_MX25) || defined(CONFIG_MX27) || defined(CONFIG_MX51) || \
+		defined(CONFIG_MX53) || defined(CONFIG_MX6) || \
+		defined(CONFIG_MX7) || defined(CONFIG_IMX8) || defined(CONFIG_IMX8M)
+	[3] = GPIO4_BASE_ADDR,
+#endif
+#if defined(CONFIG_MX27) || defined(CONFIG_MX53) || defined(CONFIG_MX6) || \
+		defined(CONFIG_MX7) || defined(CONFIG_IMX8) || defined(CONFIG_IMX8M)
+	[4] = GPIO5_BASE_ADDR,
+#if !(defined(CONFIG_MX6UL) || defined(CONFIG_MX6ULL) || defined(CONFIG_IMX8M))
+	[5] = GPIO6_BASE_ADDR,
+#endif
+#endif
+#if defined(CONFIG_MX53) || defined(CONFIG_MX6) || defined(CONFIG_MX7) || \
+		defined(CONFIG_IMX8)
+#if !(defined(CONFIG_MX6UL) || defined(CONFIG_MX6ULL))
+	[6] = GPIO7_BASE_ADDR,
+#endif
+#endif
+#if defined(CONFIG_IMX8)
+	[7] = GPIO8_BASE_ADDR,
+#endif
+};
+
+static struct gpio_regs {
+	u32 gpio_dr;	/* data */
+	u32 gpio_dir;	/* direction */
+	u32 gpio_psr;	/* pad satus */
+};
+
+
+// define GPIO_TO_PORT(n)		((n / 32) - 1)   == 0
+
+int boot_time_test(unsigned gpio, int value)
+{
+	unsigned int port = GPIO_TO_PORT(IMX_GPIO_NR(0, 1)); //#define GPIO_TO_PORT(IMX_GPIO_NR(0, 1))		((n / 32) - 1)
+	//port = 0;
+	struct gpio_regs *regs;
+	u32 l;
+	unsigned gpio_val = gpio & 0x1f; //gpio_val = 0;
+	regs = (struct gpio_regs *)gpio_ports[port]; //regs = GPIO1_BASE_ADDR; 0x5D080000  3033002C
+	l = readl(&regs->gpio_dr);
+	if (value)
+		l |= 1 << gpio_val;
+	else
+		l &= ~(1 << gpio_val);
+	writel(l, &regs->gpio_dr);
+	
+	
+	unsigned gpio_dir = gpio & 0x1f;
+	l = readl(&regs->gpio_dir);
+	l |= 1 << gpio_dir;
+	writel(l, &regs->gpio_dir);
+	return 0;
+}
+
+static int mxc_gpio_direction(unsigned int gpio)
+{
+	port = GPIO_TO_PORT(gpio);
+	gpio &= 0x1f;
+	regs = (struct gpio_regs *)gpio_ports[port];
+	l = readl(&regs->gpio_dir);
+	l |= 1 << gpio;
+	writel(l, &regs->gpio_dir);
+	return 0;
+}
+
+static int initf_dm(void)
+{
+#if defined(CONFIG_DM) && CONFIG_VAL(SYS_MALLOC_F_LEN)
+	int ret;
+
+	bootstage_start(BOOTSTATE_ID_ACCUM_DM_F, "dm_f");
+	ret = dm_init_and_scan(true);
+	bootstage_accum(BOOTSTATE_ID_ACCUM_DM_F);
+	if (ret)
+		return ret;
+#endif
+
+	return 0;
+}
+
+#ifdef CONFIG_DM
+static int initr_dm(void)
+{
+	int ret;
+
+	/* Save the pre-reloc driver model and start a new one */
+	gd->dm_root_f = gd->dm_root;
+	gd->dm_root = NULL;
+	bootstage_start(BOOTSTATE_ID_ACCUM_DM_R, "dm_r");
+	ret = dm_init_and_scan(false);
+	bootstage_accum(BOOTSTATE_ID_ACCUM_DM_R);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+
+1562116096
+
+	initr_env
+		env_relocate
+			env_load
+			
+	
+U_BOOT_CMD(		
+		do_boota
+			do_bootm
+				do_bootm_states
+					static boot_os_fn *boot_os[] = {
+					do_bootm_linux
+						boot_jump_linux	
+							announce_and_cleanup
+
+
+
+
+
+
+

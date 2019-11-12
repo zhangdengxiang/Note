@@ -1,0 +1,33 @@
+HAL:
+架构：新的架构使用的是module stub方式
+	 上层应用层或框架层代码加载so库代码，so库代码我们称为module，在HAL层注册了每个硬件对象的存根stub，
+	 当上层需要访问硬件的时候，就从当前注册的硬件对象stub里查找，找到之后stub会向上层module提供该硬件对象的operations interface（操作接口），
+	 该操作接口就保存在了module中，上层应用或框架再通过这个module操作接口来访问硬件
+
+
+HAL stub的框架比较简单，三个结构体、两个常量、一个函数，简称321架构：	 
+	1->:每一个硬件都通过hw_module_t来描述，我们称之为一个硬件对象。你可以去“继承”这个hw_module_t，然后扩展自己的属性，
+		硬件对象必须定义为一个固定的名字：HMI，即：Hardware Module Information的简写，
+		每一个硬件对象里都封装了一个函数指针open用于打开该硬件，我们理解为硬件对象的open方法，open调用后返回这个硬件对应的Operation interface。
+	2->:hw_module_t结构体中包含的硬件的操作方式hw_module_methods_t结构体。这个methods机构体里面只有一个open方法。
+		硬件对象的open方法描述结构体，它里面只有一个元素：open函数指针	
+	3->:hw_device_t结构体，硬件的操作接口
+		硬件对象hw_module_t的open方法返回该硬件的Operation interface，它由hw_device_t结构体来描述，
+		我们称之为：该硬件的操作接口
+	++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	每个硬件对象由一个hw_module_t来描述，只要我们拿到了这个硬件对象，就可以调用它的open方法，返回这个硬件对象的硬件操作接口，
+	然后就可以通过这些硬件操作接口来间接操作硬件了。只不过，open方法被struct hw_module_methods_t结构封装了一次，硬件操作接口被hw_device_t封装了一次而已。
+	
+加载本地库：
+	package pkg;  
+	class Cls { 
+		 native double f(int i, String s); 		// 声明为本地方法
+		 static { 
+			 System.loadLibrary(“pkg_Cls”); 	// 通过静态初始化语句块来加载动态库，仅仅执行一次
+		 } 
+	} 
+
+
+JNI:
+jniRegisterNativeMethods:注册本地方法与java的映射
+
